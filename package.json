@@ -1,0 +1,57 @@
+{
+  "name": "axios-service",
+  "version": "1.0.0",
+  "description": "make axios more easlier to use in code",
+  "main": "dist/axios-service.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example": "webpack-dev-server --config build/webpack.example.conf.js --open",
+    "build:umd": "webpack --config build/webpack.prod.conf.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js --compress"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/libaoxu/axios-service.git"
+  },
+  "keywords": [
+    "axios",
+    "service",
+    "request",
+    "ajax"
+  ],
+  "author": "libaoxu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/libaoxu/axios-service/issues"
+  },
+  "homepage": "https://github.com/libaoxu/axios-service#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^5.1.4",
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^12.0.0-alpha.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.8.1",
+    "webpack-cli": "^2.1.3",
+    "webpack-dev-server": "^3.1.4",
+    "webpack-merge": "^4.1.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}

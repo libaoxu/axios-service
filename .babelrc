@@ -1,0 +1,5 @@
+{
+  "presets": ["babel-preset-env", "stage-2"],
+  "plugins": [],
+  "comments": false
+}
