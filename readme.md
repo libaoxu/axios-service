@@ -2,19 +2,27 @@
 > 注意: 全局设置为全局通用的配置, 需要再入口处设置, 下面配置项也可以针对某个请求单独设置
 
 ```js
+import axios from 'axios'
 import axiosService from 'axios-service'
 
-// 基础设置
-axiosService.setDefaults({
-  withCredentials: true
+axiosService.init(axios, {
+  // 基础设置
+  defaults: {
+    withCredentials: true
+  },
+  // 请求配置项设置
+  requestDefaults: {
+    autoLoading: true,
+    // server端请求msg
+    msgKey: 'msg',
+    // server端数据的key
+    dataKey: 'data',
+    // server端请求状态的key
+    codeKey: 'code',
+    // 浏览器请求成功的状态
+    successNo: 200
+  }
 })
-
-// 请求配置项设置
-axiosService.setRequestDefaults({
-  errMsgKey: 'msg',
-  codeKey: 'status',
-})
-
 ```
 
 ### apis配置
