@@ -19,7 +19,7 @@ then
   # commit
   git add -A
   git commit -m "[build] $VERSION"
-  npm version $VERSION --message "[build: release] $VERSION"
+  npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
 
   if [[ -z $RELEASE_TAG ]]; then
     npm publish
