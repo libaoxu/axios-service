@@ -1,4 +1,4 @@
-git checkout -b master
+git checkout master
 git merge dev
 
 #!/usr/bin/env sh
@@ -30,7 +30,7 @@ then
   # publish
   git push origin refs/tags/v$VERSION
   git push origin master
-  git checkout -b dev
+  git checkout dev
   git rebase master
   git push origin dev
 fi
