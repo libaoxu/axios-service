@@ -5,9 +5,10 @@
 		define([], factory);
 	else if(typeof exports === 'object')
 		exports["axiosService"] = factory();
+	//libaoxu
 	else
 		root["axiosService"] = factory();
-})(window, function() {
+})(typeof self !== "undefined" ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -120,6 +121,8 @@ var getWrapperRequest = function getWrapperRequest(instance) {
         successNo = _service$requestDefau.successNo;
 
     return function request(opts) {
+      var requestInfo = ['url: ' + instance.baseURL + opts.url, ', params:', opts.params, ', data:', opts.data];
+
       return instance(opts).then(function (response) {
         var status = response.status,
             apiRes = response.data,
@@ -139,13 +142,16 @@ var getWrapperRequest = function getWrapperRequest(instance) {
           if (code === successNo) {
             return Promise.resolve(apiRes);
           } else {
-            console.error('[service\u8BF7\u6C42\u9519\u8BEF] url: ' + instance.baseURL + opts.url + ', errMsg: ' + errMsg, ', params:', opts.params, ', data:', opts.data);
+            var _console;
+
+            (_console = console).error.apply(_console, ['[service\u8BF7\u6C42\u9519\u8BEF], errMsg: ' + errMsg + ', '].concat(requestInfo));
             return Promise.reject(apiRes);
           }
         }
       }, function (e) {
-        console.log(instance.baseURL);
-        console.error('[service\u8BF7\u6C42\u5931\u8D25] url: ' + instance.baseURL + opts.url + ',', ', params:', opts.params, ', data:', opts.data);
+        var _console2;
+
+        (_console2 = console).error.apply(_console2, ['[service\u8BF7\u6C42\u5931\u8D25]: '].concat(requestInfo));
         return Promise.reject(e);
       });
     };
@@ -233,9 +239,6 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
           method: _requestTypes.POST,
           data: data,
           transformRequest: [function (data, headers) {
-            if (typeof window === 'undefined') {
-              console.error('application/x-www-form-urlencoded类型, 请在客户端请求, url:', url);
-            }
 
             return Object.keys(data).reduce(function (formData, key) {
               formData.append(key, data[key]);
@@ -449,3 +452,4 @@ exports.default = Service;
 /***/ })
 /******/ ]);
 });
+//# sourceMappingURL=axios-service.js.map

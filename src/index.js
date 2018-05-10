@@ -28,6 +28,8 @@ const getWrapperRequest = function getWrapperRequest (instance) {
      * todo loading
      */
     return function request (opts) {
+      const requestInfo =  [`url: ${instance.baseURL}${opts.url}`, ', params:', opts.params, ', data:', opts.data]
+
       return instance(opts)
         .then(response => {
           const { status, data: apiRes, config } = response
@@ -46,13 +48,12 @@ const getWrapperRequest = function getWrapperRequest (instance) {
             if (code === successNo) {
               return Promise.resolve(apiRes)
             } else {
-              console.error(`[service请求错误] url: ${instance.baseURL}${opts.url}, errMsg: ${errMsg}`, ', params:', opts.params, ', data:', opts.data)
+              console.error(`[service请求错误], errMsg: ${errMsg}, `, ...requestInfo)
               return Promise.reject(apiRes)
             }
           }
         }, (e) => {
-          console.log(instance.baseURL)
-          console.error(`[service请求失败] url: ${instance.baseURL}${opts.url},`, ', params:', opts.params, ', data:', opts.data)
+          console.error(`[service请求失败]: `, ...requestInfo)
           return Promise.reject(e)
         
         })
@@ -147,9 +148,9 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
           method: POST, 
           data,
           transformRequest: [function (data, headers) {
-            if (typeof window === 'undefined') {
-              console.error('application/x-www-form-urlencoded类型, 请在客户端请求, url:', url)
-            }
+            // if (typeof window === 'undefined') {
+            //   console.error('application/x-www-form-urlencoded类型, 请在客户端请求, url:', url)
+            // }
   
             return Object.keys(data)
               .reduce((formData, key) => {
