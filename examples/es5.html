@@ -26,8 +26,8 @@ service.init(axios, {
     dataKey: 'data',
     // server端请求状态的key
     codeKey: 'code',
-    // 浏览器请求成功的状态
-    successNo: 200
+    // server端请求成功的状态, 注意: 是服务端返回的请求成功的状态码, 不是xhr在浏览器端的返回状态
+    successCode: 200
   }
 })
 

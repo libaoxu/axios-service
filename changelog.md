@@ -1,3 +1,15 @@
+### 1.0.4
+
+*2018-05-10*
+
+- 更新service.init中接收的requestDefaults这个参数, 将successNo -> successCode, 并添加说明, 此为response.data下该接口请求成功状态码, 非浏览器中http请求返回的成功状态(200)
+- src/config.js 中 将status.SUCCESS -> STATUS_200
+- 整理readme
+
+**todo** 
+- 支持jsonp
+- 添加travis.xml
+
 ### 1.0.3
 
 *2018-05-10*

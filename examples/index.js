@@ -1,7 +1,9 @@
 import axios from 'axios'
 import axiosService from 'axios-service'
 import { getInfo, getPeInfo, updateForm, getHost } from './apis'
-console.log(axiosService)
+import jsonp from 'jsonp'
+
+// console.log(axiosService)
 axiosService.init(axios, {
   defaults: {
     withCredentials: true
@@ -14,9 +16,17 @@ axiosService.init(axios, {
     dataKey: 'data',
     // server端请求状态的key
     codeKey: 'code',
-    // 浏览器请求成功的状态
-    successNo: 200
+    // server端请求成功的状态
+    successCode: 0
   }
+})
+
+jsonp('https://suggest.taobao.com/sug', {
+  param: 'q=love&callback',
+  // prefix: 'cb',
+  // name: 'callback'
+}, (err, res) => {
+  console.log(res)
 })
 
 // 普通get请求

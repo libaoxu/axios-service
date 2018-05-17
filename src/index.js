@@ -1,11 +1,11 @@
 /**
  * axios封装, 为了业务层更简洁实用, 不需要判断status 和 codeKey等重复逻辑
- * @author libx@inke.cn
+ * @author libaoxu
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
 import { formatRestFulUrl } from './utils'
-import { codes, defaults, requestDefaults } from './config'
+import { STATUS_200, defaults, requestDefaults } from './config'
 import Service from './service'
 
 export const service = new Service({
@@ -15,7 +15,7 @@ export const service = new Service({
 
 const getWrapperRequest = function getWrapperRequest (instance) {
   return function wrapperRequest (requestOpts) {
-    const { autoLoading, msgKey, codeKey, dataKey, successNo } = {
+    const { autoLoading, msgKey, codeKey, dataKey, successCode } = {
       ...service.requestDefaults,
       ...requestOpts,
     }
@@ -34,7 +34,7 @@ const getWrapperRequest = function getWrapperRequest (instance) {
         .then(response => {
           const { status, data: apiRes, config } = response
 
-          if (status === codes.SUCCESS) {
+          if (status === STATUS_200) {
             // 如果不存在dataKey, 则不处理data相关的值, 仅将data返回回去
             if (!dataKey) {
               return Promise.resolve(apiRes)
@@ -45,7 +45,7 @@ const getWrapperRequest = function getWrapperRequest (instance) {
 
             apiRes.__response__ = response
             
-            if (code === successNo) {
+            if (code === successCode) {
               return Promise.resolve(apiRes)
             } else {
               console.error(`[service请求错误], errMsg: ${errMsg}, `, ...requestInfo)
@@ -103,6 +103,12 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
         }
       } 
     }
+  }
+}
+
+const jsonWrapperRequest = function jsonWrapperRequest (baseConfigs) {
+  return function wrapperRequest (opts) {
+    
   }
 }
 
@@ -214,6 +220,10 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
     request: function axiosServiceRequest (url, requestOpts) {
       const request = wrapperRequest(requestOpts)
       return configs => request({ url, ...configs })
+    },
+    // todo
+    jsonp: function axiosServiceJsonp (url, requestOpts) {
+
     }
   }
 

@@ -118,7 +118,7 @@ var getWrapperRequest = function getWrapperRequest(instance) {
         msgKey = _service$requestDefau.msgKey,
         codeKey = _service$requestDefau.codeKey,
         dataKey = _service$requestDefau.dataKey,
-        successNo = _service$requestDefau.successNo;
+        successCode = _service$requestDefau.successCode;
 
     return function request(opts) {
       var requestInfo = ['url: ' + instance.baseURL + opts.url, ', params:', opts.params, ', data:', opts.data];
@@ -129,7 +129,7 @@ var getWrapperRequest = function getWrapperRequest(instance) {
             config = response.config;
 
 
-        if (status === _config.codes.SUCCESS) {
+        if (status === _config.STATUS_200) {
           if (!dataKey) {
             return Promise.resolve(apiRes);
           }
@@ -139,7 +139,7 @@ var getWrapperRequest = function getWrapperRequest(instance) {
 
           apiRes.__response__ = response;
 
-          if (code === successNo) {
+          if (code === successCode) {
             return Promise.resolve(apiRes);
           } else {
             var _console;
@@ -207,6 +207,10 @@ var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
       };
     }
   };
+};
+
+var jsonWrapperRequest = function jsonWrapperRequest(baseConfigs) {
+  return function wrapperRequest(opts) {};
 };
 
 var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot() {
@@ -300,7 +304,9 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
       return function (configs) {
         return request(_extends({ url: url }, configs));
       };
-    }
+    },
+
+    jsonp: function axiosServiceJsonp(url, requestOpts) {}
   };
 
   return requests;
@@ -358,9 +364,7 @@ var formatRestFulUrl = exports.formatRestFulUrl = function formatRestFulUrl() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var codes = exports.codes = {
-  SUCCESS: 200
-};
+var STATUS_200 = exports.STATUS_200 = 200;
 
 var defaults = exports.defaults = {};
 
@@ -373,7 +377,7 @@ var requestDefaults = exports.requestDefaults = {
 
   codeKey: 'dm_error',
 
-  successNo: 0
+  successCode: 0
 };
 
 /***/ }),

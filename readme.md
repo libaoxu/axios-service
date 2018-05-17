@@ -12,15 +12,17 @@ axiosService.init(axios, {
   },
   // 请求配置项设置
   requestDefaults: {
+    // 目前还没实现, 预计在下个版本中处理
     autoLoading: true,
-    // server端请求msg
+    // response.data下面的配置
+    // server端请求msg(
     msgKey: 'msg',
     // server端数据的key
     dataKey: 'data',
     // server端请求状态的key
     codeKey: 'code',
-    // 浏览器请求成功的状态
-    successNo: 200
+    // server端请求成功的状态, 注意: 此为response.data下该接口请求成功状态码, 非浏览器中http请求返回的成功状态(200)
+    successCode: 0
   }
 })
 ```
@@ -45,7 +47,7 @@ export const getPeInfo = peGet('api/v2/user/login', {
 ```
 
 具体使用
-> 新版的servce再api中配置完即可直接使用, 不需要再次S.extend之类的, 也不需要从Service中获取具体的请求函数
+> 新版的servce在api中配置完即可直接使用, 不需要再次S.extend之类的, 也不需要从Service中获取具体的请求函数
 
 ```js
 import { getInfo } from './apis'
@@ -113,7 +115,7 @@ getHost({
 - scripts: 抽象不同功能， 一定要自动化
 - main: 指定node_modules中依赖的入口文件
 
-7. **eslint**: 业务代码要有规范, 通用项目要有代码规范, 
+7. **eslint**: 业务代码要有规范, 通用项目更要有代码规范, 
 8. **changelog**: 每次项目迭代所做的修改一定做好记录
 9. test： 通用的组件肯定是业务无关的, 最好要有单元测试
 10. travis：持续集成
