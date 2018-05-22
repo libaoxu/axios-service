@@ -1,4 +1,5 @@
 import { codes, defaults, requestDefaults } from './config'
+import { extend, deepMerge, merge } from './utils'
 
 export default class Service {
   constructor (options = {}) {
@@ -21,11 +22,11 @@ export default class Service {
   
   setDefaults (newConfig) {
     // todo deepCopy
-    Object.assign(this.$http.defaults, { ...defaults, ...newConfig })
+    deepMerge(this.$http.defaults, { ...defaults, ...newConfig })
   }
   
   setRequestDefaults (newRequestOpts = {}) {
-    Object.assign(this.requestDefaults, newRequestOpts)
+    extend(this.requestDefaults, newRequestOpts)
   }
 
   _executeRequestInstance () {

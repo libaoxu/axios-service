@@ -1,5 +1,5 @@
 {
-  "presets": ["babel-preset-env", "stage-2"],
+  "presets": ["stage-2", "es2015"],
   "plugins": [],
   "comments": false
 }

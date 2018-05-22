@@ -344,6 +344,16 @@ var HEAD = exports.HEAD = 'head';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.isString = isString;
+exports.isNumber = isNumber;
+exports.isUndefined = isUndefined;
+exports.isObject = isObject;
+exports.forEach = forEach;
+exports.merge = merge;
+exports.deepMerge = deepMerge;
 var deepCopy = exports.deepCopy = function deepCopy(target) {};
 
 var formatRestFulUrl = exports.formatRestFulUrl = function formatRestFulUrl() {
@@ -352,6 +362,91 @@ var formatRestFulUrl = exports.formatRestFulUrl = function formatRestFulUrl() {
   return Object.keys(urlData || {}).reduce(function (url, key) {
     return url.replace('$' + key, urlData[key]);
   }, resfulUrl || '');
+};
+
+var _toString = Object.prototype.toString;
+
+var isArray = exports.isArray = function isArray(val) {
+  return toString.call(val) === '[object Array]';
+};
+
+function isString(val) {
+  return typeof val === 'string';
+}
+
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+function isObject(val) {
+  return val !== null && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
+}
+
+function forEach(obj, fn) {
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object') {
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+function merge() {
+  var result = {};
+  function assignValue(val, key) {
+    if (_typeof(result[key]) === 'object' && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+function deepMerge() {
+  var result = {};
+  function assignValue(val, key) {
+    if (_typeof(result[key]) === 'object' && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if ((typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+var extend = exports.extend = function extend(to, _from) {
+  for (var key in _from) {
+    to[key] = _from[key];
+  }
+  return to;
 };
 
 /***/ }),
@@ -397,6 +492,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _config = __webpack_require__(3);
 
+var _utils = __webpack_require__(2);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Service = function () {
@@ -428,14 +525,14 @@ var Service = function () {
   }, {
     key: 'setDefaults',
     value: function setDefaults(newConfig) {
-      Object.assign(this.$http.defaults, _extends({}, _config.defaults, newConfig));
+      (0, _utils.deepMerge)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
     }
   }, {
     key: 'setRequestDefaults',
     value: function setRequestDefaults() {
       var newRequestOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      Object.assign(this.requestDefaults, newRequestOpts);
+      (0, _utils.extend)(this.requestDefaults, newRequestOpts);
     }
   }, {
     key: '_executeRequestInstance',
