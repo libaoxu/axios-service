@@ -1,7 +1,7 @@
 ### 1.0.5
 
 *2018-05-10*
-- 将Object.assign 替换为extend, 以后这种es6的api通过uitl自己实现, 防止真实构造函数不编译情况
+- 将Object.assign 替换为extend, 以后这种es6的api通过uitl自己实现, 防止真实构造函数不编译情况(不能使用tranform-runtime 这样包会太大)
 
 
 ### 1.0.4
