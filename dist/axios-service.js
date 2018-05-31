@@ -134,17 +134,17 @@ var getWrapperRequest = function getWrapperRequest(instance) {
             return Promise.resolve(apiRes);
           }
           var data = apiRes[dataKey];
-          var errMsg = apiRes[msgKey];
+          var msg = apiRes[msgKey];
           var code = apiRes[codeKey];
 
-          apiRes.__response__ = response;
+          (0, _utils.extend)(apiRes, { data: data, msg: msg, code: code, __response__: response });
 
           if (code === successCode) {
             return Promise.resolve(apiRes);
           } else {
             var _console;
 
-            (_console = console).error.apply(_console, ['[service\u8BF7\u6C42\u9519\u8BEF], errMsg: ' + errMsg + ', '].concat(requestInfo));
+            (_console = console).error.apply(_console, ['[service\u8BF7\u6C42\u9519\u8BEF], msg: ' + msg + ', code: ' + code + ' '].concat(requestInfo));
             return Promise.reject(apiRes);
           }
         }

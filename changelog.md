@@ -1,3 +1,9 @@
+### 1.0.7
+
+*2018-05-31*
+
+- 将response统一返回 data, msg, code这三个key
+
 ### 1.0.5
 
 *2018-05-10*
@@ -12,7 +18,7 @@
 - src/config.js 中 将status.SUCCESS -> STATUS_200
 - 整理readme
 
-**todo** 
+**todo**
 - 支持jsonp
 - 添加travis.xml
 

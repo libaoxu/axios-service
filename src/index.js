@@ -4,7 +4,7 @@
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
-import { formatRestFulUrl } from './utils'
+import { formatRestFulUrl, extend } from './utils'
 import { STATUS_200, defaults, requestDefaults } from './config'
 import Service from './service'
 
@@ -40,15 +40,15 @@ const getWrapperRequest = function getWrapperRequest (instance) {
               return Promise.resolve(apiRes)
             }
             let data = apiRes[dataKey]
-            let errMsg = apiRes[msgKey]
+            let msg = apiRes[msgKey]
             let code = apiRes[codeKey]
 
-            apiRes.__response__ = response
+            extend(apiRes, { data, msg, code, __response__: response })
             
             if (code === successCode) {
               return Promise.resolve(apiRes)
             } else {
-              console.error(`[service请求错误], errMsg: ${errMsg}, `, ...requestInfo)
+              console.error(`[service请求错误], msg: ${msg}, code: ${code} `, ...requestInfo)
               return Promise.reject(apiRes)
             }
           }
