@@ -62,7 +62,7 @@ getInfo({
     ticket: 'ticket',
   }
 })
-  .then(({ data, __response__: response }) => {
+  .then(({ data }) => {
     // 这里的data就是成功的data, 不需要再判断
     console.log(data)
   }, (e) => {
@@ -106,7 +106,7 @@ getHost({
 
 ```
 
-### 启动实例
+### 启动示例
 ```
 // demo页
 npm run example
