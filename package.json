@@ -1,6 +1,6 @@
 {
   "name": "axios-service",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "make axios more easlier to use in code",
   "main": "dist/axios-service.js",
   "directories": {
