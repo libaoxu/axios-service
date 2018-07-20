@@ -11,5 +11,3 @@ script:
 - npm run build
 
 after_script:
-
-# - cat ./test/unit/coverage/lcov.info | ./node_modules/.bin/coveralls
