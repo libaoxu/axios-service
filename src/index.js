@@ -10,11 +10,12 @@ import Service from './service'
 
 export const service = new Service({
   requestDefaults,
-  createdRequestStack: []
+  createdRequestStack: [],
+  createdAxiosInstanceStack: []
 })
 
-const getWrapperRequest = function getWrapperRequest (instance) {
-  return function wrapperRequest (requestOpts) {
+const getWrapperRequestByInstance = function getWrapperRequestByInstance (instance) {
+  return function getRequestWithOptions (requestOpts) {
     const { autoLoading, msgKey, codeKey, dataKey, successCode } = {
       ...service.requestDefaults,
       ...requestOpts,
@@ -43,7 +44,7 @@ const getWrapperRequest = function getWrapperRequest (instance) {
             let msg = apiRes[msgKey]
             let code = apiRes[codeKey]
 
-            extend(apiRes, { data, msg, code, __response__: response })
+            extend(apiRes, { data, msg, code })
             
             if (code === successCode) {
               return Promise.resolve(apiRes)
@@ -62,7 +63,9 @@ const getWrapperRequest = function getWrapperRequest (instance) {
 }
 
 const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
-  const { root = '/' } = baseConfigs
+  const { root = '/', isCreateInstance } = baseConfigs
+  let axiosInstance
+  let asyncAxiosInstance
   let _request
   let $httpResolve
   let timeout = 3000
@@ -71,38 +74,77 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
   })
   
   let tid = setTimeout(() => {
-    if (!_request) {
+    if (!axiosInstance) {
       console.error('请注入axios实例, 如: axiosService.init(axios, config)')
     }
   }, timeout)
   
-  const createInstance = function createInstance (requestOpts) {
-    clearTimeout(tid)
-    let instance = service.$http.create({
-      baseURL: root,
-      ...baseConfigs
-    })
-    instance.baseURL = root
-    return _request = getWrapperRequest(instance)(requestOpts)
+  const getInstance = function getInstance () {
+    if (service.$http) {
+      clearTimeout(tid)
+      let instance
+
+      if (isCreateInstance) {
+        instance = service.$http.create({
+          baseURL: root,
+          ...baseConfigs
+        })
+      } else {
+        instance = opts => service.$http({ ...opts, url: root + opts.url })
+      }
+      instance.baseURL = root
+
+      return instance
+    }
   }
 
-  return function wrapperRequest (requestOpts) {
-    if (service.$http) {
-      return createInstance(requestOpts)
-    } else {
-      // 处理异步注入axioIntance的情况
-      $httpReady.then(() => {
-        createInstance(requestOpts)
-      })
-      service.createdRequestStack.push($httpResolve)
-      return function requestDecorator (...params) {
-        if (_request) {
-          return _request(...params)
-        } else {
-          return $httpReady.then(() => _request(...params))
-        }
-      } 
+  const getInstaceSync = function getInstaceSync () {
+    // 处理异步注入axioIntance的情况
+    if (!service.$http) {
+      service.createdAxiosInstanceStack.push($httpResolve)
+      return $httpReady.then(getInstance)
     }
+  }
+
+  const getRequest = (axiosInstance, requestOpts) => {
+    const _getRequestByOpts = getWrapperRequestByInstance(axiosInstance)
+    return _getRequestByOpts(requestOpts)
+  }
+  
+  // 保证了, 同一个wrapperRequsetAdaptor, 只创建有一个axiosInstance
+  axiosInstance = getInstance()
+
+  if (!axiosInstance) {
+    // 异步注入axois情况, getInstance也是一次
+    asyncAxiosInstance = getInstaceSync()
+    asyncAxiosInstance.then((_axiosInstance) => {
+      axiosInstance = _axiosInstance
+    })
+  }
+
+  const wrapperRequest = function wrapperRequest (requestOpts) {
+    let _request
+    if (axiosInstance) {
+      _request = getRequest(axiosInstance, requestOpts)
+    } else {
+      asyncAxiosInstance && asyncAxiosInstance.then((axiosInstance) => {
+        _request = getRequest(axiosInstance, requestOpts)
+      })
+    }
+
+    return function requestDecorator (...params) {
+      if (_request) {
+        return _request(...params)
+      } else {
+        return asyncAxiosInstance.then(() => _request(...params))
+      }
+    }
+  }
+
+  return {
+    getAxiosInstance: _ => axiosInstance,
+    getAsyncAxiosInstance: _ => asyncAxiosInstance,
+    wrapperRequest
   }
 }
 
@@ -115,13 +157,18 @@ const jsonWrapperRequest = function jsonWrapperRequest (baseConfigs) {
 /**
  * 根据根路径获取请求函数
  * 
- * @param {any} baseConfigs axios的基础配置, 详见https://github.com/axios/axios#creating-an-instance
+ * @param {any} baseConfigs axios的基础配置, 
+ * @property {String} baseConfigs.root 根路劲
+ * @property {Boolean} baseConfigs.isCreateInstance 是否创建新实例, 即: axios.create
+ * 
  * @returns {Object} requests axios请求集合
  */
 export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
-  const wrapperRequest = wrapperRequsetAdaptor(baseConfigs)
+  const { wrapperRequest, getAxiosInstance, getAsyncAxiosInstance } = wrapperRequsetAdaptor(baseConfigs)
 
   const requests = {
+    getAxiosInstance,
+    getAsyncAxiosInstance,
     /**
      * get请求的封装
      * 
@@ -129,7 +176,7 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
      * @param {Object} requestOpts 请求的配置项, 详见config.js中的requestDefaults
      * @returns {Function} 业务层做请求的函数
      */
-    get: function axiosServiceGet (url, requestOpts) { 
+    get: function axiosServiceGet (url, requestOpts) {
       const request = wrapperRequest(requestOpts)
       /**
        * @param {Object} params 即get请求需要的数据
@@ -153,7 +200,7 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
           url, 
           method: POST, 
           data,
-          transformRequest: [function (data, headers) {
+          transformRequest: [function (data = {}, headers) {
             // if (typeof window === 'undefined') {
             //   console.error('application/x-www-form-urlencoded类型, 请在客户端请求, url:', url)
             // }
