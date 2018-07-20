@@ -6,7 +6,7 @@ const path = require('path')
 
 module.exports = merge(baseConfig, {
   mode: 'development',
-  entry: { index: path.join(__dirname, '../examples/index.js') },
+  entry: { index: path.join(__dirname, '../examples/client/index.js') },
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, '../dist')
@@ -15,19 +15,19 @@ module.exports = merge(baseConfig, {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../examples/index.html'),
+      template: path.join(__dirname, '../examples/client/index.html'),
       inject: true,
     }),
   ],
   resolve: {
     alias: {
-      // 'axios-service': path.resolve(__dirname, '../src/index.js')
-      'axios-service': path.resolve(__dirname, '../dist/axios-service.js')
+      'axios-service': path.resolve(__dirname, '../src/index.js'),
+      // 'axios-service': path.resolve(__dirname, '../dist/axios-service.js')
     }
   },
   devServer: {
     port: 3800,
-    host: '0.0.0.0',
+    host: '127.0.0.1',
     inline:true,
     hot: true,
     proxy: {

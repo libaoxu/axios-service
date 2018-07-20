@@ -32,9 +32,11 @@ axiosService.init(axios, {
 
 ```js
 import { service, getRequestsByRoot } from 'axios-service'
-const { get, post, postXForm } = getRequestsByRoot({ root: 'https://www.demo.cn/' })
+// root: 请求跟路劲, 这里默认都是全局, 不走axios.create
+const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-const { get: peGet, post: pePost, restFulGet: peRestFulGet } = getRequestsByRoot({ root: 'http://api.demo.cn/' })
+// isCreateInstance 表示axios.create创建新的实例
+const { get: peGet, post: pePost, restFulGet: peRestFulGet } = getRequestsByRoot({ root: 'https://api.github.com/', isCreateInstance: true })
 
 
 export const getInfo = get('api/aladdin/login/info')
@@ -60,7 +62,7 @@ getInfo({
     ticket: 'ticket',
   }
 })
-  .then(({ data, __response__: response }) => {
+  .then(({ data }) => {
     // 这里的data就是成功的data, 不需要再判断
     console.log(data)
   }, (e) => {
@@ -96,13 +98,33 @@ getHost({
 }, {
   name: 'test'
 })
-  .then(({ data, __response__: response }) => {
+  .then(({ data }) => {
     console.log(data)
   }, (e) => {
     console.log(e)
   })
 
 ```
+
+### 启动示例
+```
+// demo页
+npm run example
+
+// 模拟api接口的node服务
+npm run apiserver
+```
+
+### 项目构建
+```
+npm run build
+```
+
+### 项目发布
+```
+npm run pub
+```
+
 
 #### 项目规范
 

@@ -4,8 +4,9 @@ import { extend, deepMerge, merge } from './utils'
 export default class Service {
   constructor (options = {}) {
     this.$http = null
-    this.requestDefaults = options.requestDefaults
-    this.createdRequestStack = options.createdRequestStack
+    this.requestDefaults = options.requestDefaults || {}
+    this.createdRequestStack = options.createdRequestStack || []
+    this.createdAxiosInstanceStack = options.createdAxiosInstanceStack || []
   }
   
   // 注意, service实例初始化时候, 只创建对象, 不需要走init, init函数由外部初始化时候注入axisoInstance
@@ -14,6 +15,7 @@ export default class Service {
     this.setDefaults(options.defaults)
     this.setRequestDefaults(options.requestDefaults)
     this._executeRequestInstance()
+    this._executeAxiosInstance()
   }
   
   setHttps ($http) {
@@ -21,7 +23,6 @@ export default class Service {
   }
   
   setDefaults (newConfig) {
-    // todo deepCopy
     deepMerge(this.$http.defaults, { ...defaults, ...newConfig })
   }
   
@@ -31,5 +32,9 @@ export default class Service {
 
   _executeRequestInstance () {
     this.createdRequestStack.forEach(fn => fn(this.$http))
+  }
+
+  _executeAxiosInstance () {
+    this.createdAxiosInstanceStack.forEach(fn => fn(this.$http)) 
   }
 }

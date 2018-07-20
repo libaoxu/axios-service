@@ -108,11 +108,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var service = exports.service = new _service2.default({
   requestDefaults: _config.requestDefaults,
-  createdRequestStack: []
+  createdRequestStack: [],
+  createdAxiosInstanceStack: []
 });
 
-var getWrapperRequest = function getWrapperRequest(instance) {
-  return function wrapperRequest(requestOpts) {
+var getWrapperRequestByInstance = function getWrapperRequestByInstance(instance) {
+  return function getRequestWithOptions(requestOpts) {
     var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
         autoLoading = _service$requestDefau.autoLoading,
         msgKey = _service$requestDefau.msgKey,
@@ -137,7 +138,7 @@ var getWrapperRequest = function getWrapperRequest(instance) {
           var msg = apiRes[msgKey];
           var code = apiRes[codeKey];
 
-          (0, _utils.extend)(apiRes, { data: data, msg: msg, code: code, __response__: response });
+          (0, _utils.extend)(apiRes, { data: data, msg: msg, code: code });
 
           if (code === successCode) {
             return Promise.resolve(apiRes);
@@ -160,8 +161,11 @@ var getWrapperRequest = function getWrapperRequest(instance) {
 
 var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
   var _baseConfigs$root = baseConfigs.root,
-      root = _baseConfigs$root === undefined ? '/' : _baseConfigs$root;
+      root = _baseConfigs$root === undefined ? '/' : _baseConfigs$root,
+      isCreateInstance = baseConfigs.isCreateInstance;
 
+  var axiosInstance = void 0;
+  var asyncAxiosInstance = void 0;
   var _request = void 0;
   var $httpResolve = void 0;
   var timeout = 3000;
@@ -170,42 +174,85 @@ var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
   });
 
   var tid = setTimeout(function () {
-    if (!_request) {
+    if (!axiosInstance) {
       console.error('请注入axios实例, 如: axiosService.init(axios, config)');
     }
   }, timeout);
 
-  var createInstance = function createInstance(requestOpts) {
-    clearTimeout(tid);
-    var instance = service.$http.create(_extends({
-      baseURL: root
-    }, baseConfigs));
-    instance.baseURL = root;
-    return _request = getWrapperRequest(instance)(requestOpts);
+  var getInstance = function getInstance() {
+    if (service.$http) {
+      clearTimeout(tid);
+      var instance = void 0;
+
+      if (isCreateInstance) {
+        instance = service.$http.create(_extends({
+          baseURL: root
+        }, baseConfigs));
+      } else {
+        instance = function instance(opts) {
+          return service.$http(_extends({}, opts, { url: root + opts.url }));
+        };
+      }
+      instance.baseURL = root;
+
+      return instance;
+    }
   };
 
-  return function wrapperRequest(requestOpts) {
-    if (service.$http) {
-      return createInstance(requestOpts);
-    } else {
-      $httpReady.then(function () {
-        createInstance(requestOpts);
-      });
-      service.createdRequestStack.push($httpResolve);
-      return function requestDecorator() {
-        for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
-          params[_key] = arguments[_key];
-        }
-
-        if (_request) {
-          return _request.apply(undefined, params);
-        } else {
-          return $httpReady.then(function () {
-            return _request.apply(undefined, params);
-          });
-        }
-      };
+  var getInstaceSync = function getInstaceSync() {
+    if (!service.$http) {
+      service.createdAxiosInstanceStack.push($httpResolve);
+      return $httpReady.then(getInstance);
     }
+  };
+
+  var getRequest = function getRequest(axiosInstance, requestOpts) {
+    var _getRequestByOpts = getWrapperRequestByInstance(axiosInstance);
+    return _getRequestByOpts(requestOpts);
+  };
+
+  axiosInstance = getInstance();
+
+  if (!axiosInstance) {
+    asyncAxiosInstance = getInstaceSync();
+    asyncAxiosInstance.then(function (_axiosInstance) {
+      axiosInstance = _axiosInstance;
+    });
+  }
+
+  var wrapperRequest = function wrapperRequest(requestOpts) {
+    var _request = void 0;
+    if (axiosInstance) {
+      _request = getRequest(axiosInstance, requestOpts);
+    } else {
+      asyncAxiosInstance && asyncAxiosInstance.then(function (axiosInstance) {
+        _request = getRequest(axiosInstance, requestOpts);
+      });
+    }
+
+    return function requestDecorator() {
+      for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+        params[_key] = arguments[_key];
+      }
+
+      if (_request) {
+        return _request.apply(undefined, params);
+      } else {
+        return asyncAxiosInstance.then(function () {
+          return _request.apply(undefined, params);
+        });
+      }
+    };
+  };
+
+  return {
+    getAxiosInstance: function getAxiosInstance(_) {
+      return axiosInstance;
+    },
+    getAsyncAxiosInstance: function getAsyncAxiosInstance(_) {
+      return asyncAxiosInstance;
+    },
+    wrapperRequest: wrapperRequest
   };
 };
 
@@ -216,9 +263,15 @@ var jsonWrapperRequest = function jsonWrapperRequest(baseConfigs) {
 var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot() {
   var baseConfigs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var wrapperRequest = wrapperRequsetAdaptor(baseConfigs);
+  var _wrapperRequsetAdapto = wrapperRequsetAdaptor(baseConfigs),
+      wrapperRequest = _wrapperRequsetAdapto.wrapperRequest,
+      getAxiosInstance = _wrapperRequsetAdapto.getAxiosInstance,
+      getAsyncAxiosInstance = _wrapperRequsetAdapto.getAsyncAxiosInstance;
 
   var requests = {
+    getAxiosInstance: getAxiosInstance,
+    getAsyncAxiosInstance: getAsyncAxiosInstance,
+
     get: function axiosServiceGet(url, requestOpts) {
       var request = wrapperRequest(requestOpts);
 
@@ -242,7 +295,10 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
           url: url,
           method: _requestTypes.POST,
           data: data,
-          transformRequest: [function (data, headers) {
+          transformRequest: [function () {
+            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            var headers = arguments[1];
+
 
             return Object.keys(data).reduce(function (formData, key) {
               formData.append(key, data[key]);
@@ -503,8 +559,9 @@ var Service = function () {
     _classCallCheck(this, Service);
 
     this.$http = null;
-    this.requestDefaults = options.requestDefaults;
-    this.createdRequestStack = options.createdRequestStack;
+    this.requestDefaults = options.requestDefaults || {};
+    this.createdRequestStack = options.createdRequestStack || [];
+    this.createdAxiosInstanceStack = options.createdAxiosInstanceStack || [];
   }
 
   _createClass(Service, [{
@@ -516,6 +573,7 @@ var Service = function () {
       this.setDefaults(options.defaults);
       this.setRequestDefaults(options.requestDefaults);
       this._executeRequestInstance();
+      this._executeAxiosInstance();
     }
   }, {
     key: 'setHttps',
@@ -541,6 +599,15 @@ var Service = function () {
 
       this.createdRequestStack.forEach(function (fn) {
         return fn(_this.$http);
+      });
+    }
+  }, {
+    key: '_executeAxiosInstance',
+    value: function _executeAxiosInstance() {
+      var _this2 = this;
+
+      this.createdAxiosInstanceStack.forEach(function (fn) {
+        return fn(_this2.$http);
       });
     }
   }]);
