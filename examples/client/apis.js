@@ -6,11 +6,13 @@ import { getRequestsByRoot } from 'axios-service'
 // 如果跨域代理, root因为为 '/', 或者不填, 因为root的默认是也是 '/'
 // 注意: 这里的root是写死的demo, 实际项目可能应该根据具体环境不同, 请求不同url做不同处理
 const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
-const { get: gitHubGet, restFulGet: gitHubRestFulGet } = getRequestsByRoot({ root: 'https://api.github.com/', isCreateInstance: true })
+const { get: gitHubGet, restFulGet: gitHubRestFulGet } = getRequestsByRoot({ root: 'https://api.github.com', isCreateInstance: true })
 
-export const getInfo = get('api/getInfo')
+export const getInfo = get('api/getInfo', null, {
+  autoLoading: false
+})
 
-export const getInfoCustom = get('api/getInfoCustom', {
+export const getInfoCustom = get('/api/getInfoCustom', {
   msgKey: 'error_msg',
   codeKey: 'dm_error'
 })

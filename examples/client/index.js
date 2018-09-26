@@ -6,10 +6,11 @@ import jsonp from 'jsonp'
 // todo 全局的loading队列
 axios.interceptors.request.use(function (e) {
   // 全局拦截器, 如果apis中的getRequestsByRoot使用isCreateInstance, 就不会走全局
-  // console.log('全局拦截器: ', e)
+  console.log('全局拦截器: ', e)
   return e
 })
 
+// axios.defaults.withCredentials = true
 // console.log(axiosService)
 axiosService.init(axios, {
   defaults: {
@@ -27,6 +28,8 @@ axiosService.init(axios, {
     successCode: 0
   }
 })
+
+console.log('axios.defaults: ', axios.defaults)
 
 const returnData = res => res.data
 
@@ -49,6 +52,7 @@ const postXForm = _ => postXFormWithStaticHeader({ name: 'libaoxu' })
 // 第一个参数是urlData, 处理restFul url中的格式的
 // 第二个参数是具体的data
 // 第三个参数是axios的config
+// chrome升级后, 不支持Access-Control-Allow-Origin: * 的处理, github这个接口估计用不了了, 后面在server中自己写一个
 const restFulDemo = _ => getGitHubUser({ user: 'libaoxu' })
 
 

@@ -1,3 +1,11 @@
+### 1.1.1
+
+*2018-09-26*
+
+- 修改service.js中 对options.defaults的deepMerge改为浅拷贝, 不能改变axios.defaults这个对象的地址引用, 详见axios.defaults源码
+- apis中getRequestsByRoot返回的函数, 如get|post|restfulGet等添加第三个参数moreConfigs, 便于透传给axios, 这样axios.interceptors可以拿到
+- utils.js添加加joinRootAndPath函数, 在getRequestsByRoot中的参数root中可以以 **/** 结束, 在get的第一个参数path中可以 以 **/** 开头, 不写也可以, 都写也可以
+
 ### 1.1.0
 
 *2018-07-19*

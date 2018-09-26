@@ -115,7 +115,6 @@ var service = exports.service = new _service2.default({
 var getWrapperRequestByInstance = function getWrapperRequestByInstance(instance) {
   return function getRequestWithOptions(requestOpts) {
     var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
-        autoLoading = _service$requestDefau.autoLoading,
         msgKey = _service$requestDefau.msgKey,
         codeKey = _service$requestDefau.codeKey,
         dataKey = _service$requestDefau.dataKey,
@@ -190,7 +189,7 @@ var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
         }, baseConfigs));
       } else {
         instance = function instance(opts) {
-          return service.$http(_extends({}, opts, { url: root + opts.url }));
+          return service.$http(_extends({}, opts, { url: (0, _utils.joinRootAndPath)(root, opts.url) }));
         };
       }
       instance.baseURL = root;
@@ -272,21 +271,21 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
     getAxiosInstance: getAxiosInstance,
     getAsyncAxiosInstance: getAsyncAxiosInstance,
 
-    get: function axiosServiceGet(url, requestOpts) {
+    get: function axiosServiceGet(url, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
 
       return function (params, configs) {
-        return request(_extends({ url: url, method: _requestTypes.GET, params: params }, configs));
+        return request(_extends({ url: url, method: _requestTypes.GET, params: params }, configs, moreConfigs));
       };
     },
-    post: function axiosServicePost(url, requestOpts) {
+    post: function axiosServicePost(url, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
 
       return function (data, configs) {
-        return request(_extends({ url: url, method: _requestTypes.POST, data: data }, configs));
+        return request(_extends({ url: url, method: _requestTypes.POST, data: data }, configs, moreConfigs));
       };
     },
-    postXForm: function axiosServicePostXForm(url, requestOpts) {
+    postXForm: function axiosServicePostXForm(url, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
       return function (data) {
         var configs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -308,57 +307,73 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
           headers: _extends({
             'Content-Type': 'application/x-www-form-urlencoded'
           }, configs.headers)
-        }, configs));
+        }, configs, moreConfigs));
       };
     },
 
-    restFulGet: function axiosServiceRestFulGet(restFulUrl, requestOpts) {
+    restFulGet: function axiosServiceRestFulGet(restFulUrl, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
 
       return function (urlData, params, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.GET, params: params }, configs));
+        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.GET, params: params }, configs, moreConfigs));
       };
     },
-    restFulPost: function axiosServicePost(restFulUrl, requestOpts) {
+    restFulPost: function axiosServicePost(restFulUrl, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
       return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.POST, data: data }, configs));
+        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.POST, data: data }, configs, moreConfigs));
       };
     },
-    delete: function axiosServiceDelete(restFulUrl, requestOpts) {
+    delete: function axiosServiceDelete(restFulUrl, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
       return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.DELETE, data: data }, configs));
+        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.DELETE, data: data }, configs, moreConfigs));
       };
     },
-    put: function axiosServicePut(restFulUrl, requestOpts) {
+    put: function axiosServicePut(restFulUrl, requestOpts, moreConfigs) {
       var request = wrapperRequest(requestOpts);
       return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PUT, data: data }, configs));
+        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PUT, data: data }, configs, moreConfigs));
       };
     },
     patch: function axiosServicePatch(restFulUrl, requestOpts) {
+      for (var _len2 = arguments.length, moreConfigs = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+        moreConfigs[_key2 - 2] = arguments[_key2];
+      }
+
       var request = wrapperRequest(requestOpts);
       return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PATCH, data: data }, configs));
+        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PATCH, data: data }, configs, moreConfigs));
       };
     },
     head: function axiosServiceHead(url, requestOpts) {
+      for (var _len3 = arguments.length, moreConfigs = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+        moreConfigs[_key3 - 2] = arguments[_key3];
+      }
+
       var request = wrapperRequest(requestOpts);
       return function (configs) {
-        return request(_extends({ url: url, method: _requestTypes.HEAD }, configs));
+        return request(_extends({ url: url, method: _requestTypes.HEAD }, configs, moreConfigs));
       };
     },
     options: function axiosServiceOptions(url, requestOpts) {
+      for (var _len4 = arguments.length, moreConfigs = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+        moreConfigs[_key4 - 2] = arguments[_key4];
+      }
+
       var request = wrapperRequest(requestOpts);
       return function (configs) {
-        return request(_extends({ url: url, method: _requestTypes.OPTIONS }, configs));
+        return request(_extends({ url: url, method: _requestTypes.OPTIONS }, configs, moreConfigs));
       };
     },
     request: function axiosServiceRequest(url, requestOpts) {
+      for (var _len5 = arguments.length, moreConfigs = Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
+        moreConfigs[_key5 - 2] = arguments[_key5];
+      }
+
       var request = wrapperRequest(requestOpts);
       return function (configs) {
-        return request(_extends({ url: url }, configs));
+        return request(_extends({ url: url }, configs, moreConfigs));
       };
     },
 
@@ -418,6 +433,16 @@ var formatRestFulUrl = exports.formatRestFulUrl = function formatRestFulUrl() {
   return Object.keys(urlData || {}).reduce(function (url, key) {
     return url.replace('$' + key, urlData[key]);
   }, resfulUrl || '');
+};
+
+var joinRootAndPath = exports.joinRootAndPath = function joinRootAndPath(root, path) {
+  var slashStartReplace = function slashStartReplace(str) {
+    return str.replace(/^\//, '');
+  };
+  var slashEndReplace = function slashEndReplace(str) {
+    return str.replace(/\/$/, '');
+  };
+  return slashEndReplace(root) + '/' + slashStartReplace(path);
 };
 
 var _toString = Object.prototype.toString;
@@ -583,7 +608,7 @@ var Service = function () {
   }, {
     key: 'setDefaults',
     value: function setDefaults(newConfig) {
-      (0, _utils.deepMerge)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
+      (0, _utils.extend)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
     }
   }, {
     key: 'setRequestDefaults',

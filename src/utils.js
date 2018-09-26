@@ -7,6 +7,12 @@ export const formatRestFulUrl = (resfulUrl = '', urlData = {}) =>
   Object.keys(urlData || {})
     .reduce((url, key) => url.replace(`$${key}`, urlData[key]), resfulUrl || '')
     
+export const joinRootAndPath = (root, path) => {
+  let slashStartReplace = str => str.replace(/^\//, '') 
+  let slashEndReplace = str => str.replace(/\/$/, '') 
+  return `${slashEndReplace(root)}/${slashStartReplace(path)}`
+}
+
 
 const _toString = Object.prototype.toString
 

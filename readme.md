@@ -32,17 +32,26 @@ axiosService.init(axios, {
 })
 ```
 
+### 参数介绍
+
+[getRequestsByRoot参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L166)
+
+[get参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L179)
+
+[restFulGet参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L229)
+
 ### apis配置
 > 注意: 上面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
 
 ```js
+
 import { service, getRequestsByRoot } from 'axios-service'
+
 // root: 请求跟路劲, 这里默认都是全局, 不走axios.create
 const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
 // isCreateInstance 表示axios.create创建新的实例
 const { get: peGet, post: pePost, restFulGet: peRestFulGet } = getRequestsByRoot({ root: 'https://api.github.com/', isCreateInstance: true })
-
 
 export const getInfo = get('api/aladdin/login/info')
 
@@ -50,6 +59,15 @@ export const getInfo = get('api/aladdin/login/info')
 export const getPeInfo = peGet('api/v2/user/login', {
   msgKey: 'msg',
   codeKey: 'status',
+})
+
+// 自定义config,
+export const getPeInfo = peGet('api/v2/user/login', {
+  msgKey: 'msg',
+  codeKey: 'status',
+}, {
+  // 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
+  autoLoading: false
 })
 ```
 

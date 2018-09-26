@@ -59,7 +59,7 @@ server = http.createServer(function (req, res) {
     writeHead(status, Object.assign({
       'Content-Type': 'application/json; charset=utf-8',
       'Access-Control-Allow-Credentials': true,     
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'http://127.0.0.1:3800',
       'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, ticket',
       'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS',
     }, params || {}))

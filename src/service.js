@@ -23,7 +23,7 @@ export default class Service {
   }
   
   setDefaults (newConfig) {
-    deepMerge(this.$http.defaults, { ...defaults, ...newConfig })
+    extend(this.$http.defaults, { ...defaults, ...newConfig })
   }
   
   setRequestDefaults (newRequestOpts = {}) {

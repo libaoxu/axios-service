@@ -4,7 +4,7 @@
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
-import { formatRestFulUrl, extend } from './utils'
+import { formatRestFulUrl, extend, joinRootAndPath } from './utils'
 import { STATUS_200, defaults, requestDefaults } from './config'
 import Service from './service'
 
@@ -16,7 +16,7 @@ export const service = new Service({
 
 const getWrapperRequestByInstance = function getWrapperRequestByInstance (instance) {
   return function getRequestWithOptions (requestOpts) {
-    const { autoLoading, msgKey, codeKey, dataKey, successCode } = {
+    const { msgKey, codeKey, dataKey, successCode } = {
       ...service.requestDefaults,
       ...requestOpts,
     }
@@ -90,7 +90,7 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
           ...baseConfigs
         })
       } else {
-        instance = opts => service.$http({ ...opts, url: root + opts.url })
+        instance = opts => service.$http({ ...opts, url: joinRootAndPath(root, opts.url )})
       }
       instance.baseURL = root
 
@@ -174,26 +174,27 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
      * 
      * @param {String} url 请求的url后缀
      * @param {Object} requestOpts 请求的配置项, 详见config.js中的requestDefaults
+     * @param {Object} moreConfigs 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
      * @returns {Function} 业务层做请求的函数
      */
-    get: function axiosServiceGet (url, requestOpts) {
+    get: function axiosServiceGet (url, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       /**
        * @param {Object} params 即get请求需要的数据
        * @param {Object} config 请求接口的配置项, 详见https://github.com/axios/axios#request-config
        * 注意: get请求, 第一个参数传params, 
        */
-      return (params, configs) => request({ url, method: GET, params, ...configs })
+      return (params, configs) => request({ url, method: GET, params, ...configs, ...moreConfigs })
     },
-    post: function axiosServicePost (url, requestOpts) {
+    post: function axiosServicePost (url, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       /**
        * @param {Object} data 即post请求需要的数据
        * 注意: post请求, 第一个参数传data
        */
-      return (data, configs) => request({ url, method: POST, data, ...configs })
+      return (data, configs) => request({ url, method: POST, data, ...configs, ...moreConfigs })
     },
-    postXForm: function axiosServicePostXForm (url, requestOpts) {
+    postXForm: function axiosServicePostXForm (url, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       return (data, configs = {}) => {
         return request({ 
@@ -215,7 +216,8 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
             'Content-Type': 'application/x-www-form-urlencoded',
             ...configs.headers
           },
-          ...configs
+          ...configs,
+          ...moreConfigs
         })
       }
     },
@@ -226,7 +228,7 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
      * @param {Object} requestOpts 请求配置项
      * @returns {Function} 具体请求的函数
      */
-    restFulGet: function axiosServiceRestFulGet (restFulUrl, requestOpts) {
+    restFulGet: function axiosServiceRestFulGet (restFulUrl, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       /**
        * @param {Object} urlData restFul中需要替换url的值, 拼接的过程serviceProxy会处理
@@ -234,42 +236,42 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
        * @param {Object} configs 请求配置项
        */
       return (urlData, params, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs })
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs})
     },
-    restFulPost: function axiosServicePost (restFulUrl, requestOpts) {
+    restFulPost: function axiosServicePost (restFulUrl, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       return (urlData, data, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: POST, data, ...configs })
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: POST, data, ...configs, ...moreConfigs })
     },
-    delete: function axiosServiceDelete (restFulUrl, requestOpts) {
+    delete: function axiosServiceDelete (restFulUrl, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       return (urlData, data, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: DELETE, data, ...configs })
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: DELETE, data, ...configs, ...moreConfigs })
     },
-    put: function axiosServicePut (restFulUrl, requestOpts) {
+    put: function axiosServicePut (restFulUrl, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
       return (urlData, data, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: PUT, data, ...configs })
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: PUT, data, ...configs, ...moreConfigs })
     },
-    patch: function axiosServicePatch (restFulUrl, requestOpts) {
+    patch: function axiosServicePatch (restFulUrl, requestOpts, ...moreConfigs) {
       const request = wrapperRequest(requestOpts)
       return (urlData, data, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: PATCH, data, ...configs })
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: PATCH, data, ...configs, ...moreConfigs })
     },
-    head: function axiosServiceHead (url, requestOpts) {
+    head: function axiosServiceHead (url, requestOpts, ...moreConfigs) {
       const request = wrapperRequest(requestOpts)
-      return configs => request({ url, method: HEAD, ...configs })
+      return configs => request({ url, method: HEAD, ...configs, ...moreConfigs })
     },
-    options: function axiosServiceOptions (url, requestOpts) {
+    options: function axiosServiceOptions (url, requestOpts, ...moreConfigs) {
       const request = wrapperRequest(requestOpts)
-      return configs => request({ url, method: OPTIONS, ...configs })
+      return configs => request({ url, method: OPTIONS, ...configs, ...moreConfigs })
     },
-    request: function axiosServiceRequest (url, requestOpts) {
+    request: function axiosServiceRequest (url, requestOpts, ...moreConfigs) {
       const request = wrapperRequest(requestOpts)
-      return configs => request({ url, ...configs })
+      return configs => request({ url, ...configs, ...moreConfigs })
     },
     // todo
-    jsonp: function axiosServiceJsonp (url, requestOpts) {
+    jsonp: function axiosServiceJsonp (url, requestOpts, ...moreConfigs) {
 
     }
   }
