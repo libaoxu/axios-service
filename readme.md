@@ -88,7 +88,7 @@ const atomPromise = new Promise((resolve, reject) => {
   })
 })
 const asyncAddUidToApi = fn => params => atomPromise.then(({ uid, sid }) => fn({ ...params, uid, sid }))
-export const asyncPostPeInfo = asyncAddUidToApi(peLoginPost)
+export const asyncPostPeInfo = asyncAddUidToApi(peUserLoginPost)
 ```
 
 具体使用
