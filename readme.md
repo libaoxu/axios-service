@@ -69,6 +69,26 @@ export const getPeInfo = peGet('api/v2/user/login', {
   // 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
   autoLoading: false
 })
+
+// 扩展函数参数
+// 如: post请求, url上带query string
+export const postPeInfo = (params, data) => pePost('api/v2/user/login', null, {
+  params,
+  data,
+  // 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
+  autoLoading: false
+})()
+ 
+
+// 扩展函数Promise, 适合异步获取请求参数
+const peUserLoginPost = pePost('api/v2/user/login')
+const atomPromise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve({ uid: 123, sid: 123 })
+  })
+})
+const asyncAddUidToApi = fn => params => atomPromise.then(({ uid, sid }) => fn({ ...params, uid, sid }))
+export const asyncPostPeInfo = asyncAddUidToApi(peLoginPost)
 ```
 
 具体使用
