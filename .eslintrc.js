@@ -1,4 +1,4 @@
-const IS_DEV = process.env.NODE_ENV === 'production'
+const IS_DEV = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   "parser": "babel-eslint",
@@ -50,14 +50,10 @@ module.exports = {
       "functions": "ignore"
     }],
     "space-before-function-paren": ["error", {"anonymous": "ignore", "named": "ignore"}],
-    "jsx-quotes": ["error", "prefer-double"],
     // 服务端某些接口就是中杆, 属性这块可以非驼峰
     "camelcase": ["error", {properties: "never"}],
     "prefer-const": "off",
     "object-curly-spacing": "off",
-    // "flowtype-errors/show-errors": 2,
-    "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error",
   },
   "settings": {
     "import/ignore": [

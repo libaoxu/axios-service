@@ -1,7 +1,7 @@
-import axios from 'axios'
 import axiosService from 'axios-service'
-import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser } from './apis'
+import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock } from './apis'
 import jsonp from 'jsonp'
+import axios from 'axios'
 
 // todo 全局的loading队列
 axios.interceptors.request.use(function (e) {
@@ -55,6 +55,8 @@ const postXForm = _ => postXFormWithStaticHeader({ name: 'libaoxu' })
 // chrome升级后, 不支持Access-Control-Allow-Origin: * 的处理, github这个接口估计用不了了, 后面在server中自己写一个
 const restFulDemo = _ => getGitHubUser({ user: 'libaoxu' })
 
+const normalGetInfoMock = _ => getInfoWithMock()
+
 
 function jsonpDemo () {
   jsonp('https://suggest.taobao.com/sug', {
@@ -62,7 +64,7 @@ function jsonpDemo () {
     // prefix: 'cb',
     // name: 'callback'
   }, (err, res) => {
-    console.log(res)
+    err && console.log(res)
   })
 }
 
@@ -86,6 +88,10 @@ const requestChains = [
   {
     text: 'restFul配置案例',
     fn: restFulDemo
+  },
+  {
+    text: '普通get请求的mock',
+    fn: normalGetInfoMock
   }
 ]
 

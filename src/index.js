@@ -5,7 +5,7 @@
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
 import { formatRestFulUrl, extend, joinRootAndPath } from './utils'
-import { STATUS_200, defaults, requestDefaults } from './config'
+import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION } from './config'
 import Service from './service'
 
 export const service = new Service({
@@ -29,7 +29,7 @@ const getWrapperRequestByInstance = function getWrapperRequestByInstance (instan
      * todo loading
      */
     return function request (opts) {
-      const requestInfo =  [`url: ${instance.baseURL}${opts.url}`, ', params:', opts.params, ', data:', opts.data]
+      const requestInfo = [`url: ${instance.baseURL}${opts.url}`, ', params:', opts.params, ', data:', opts.data]
 
       return instance(opts)
         .then(response => {
@@ -56,7 +56,6 @@ const getWrapperRequestByInstance = function getWrapperRequestByInstance (instan
         }, (e) => {
           console.error(`[service请求失败]: `, ...requestInfo)
           return Promise.reject(e)
-        
         })
     }
   }
@@ -90,7 +89,7 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
           ...baseConfigs
         })
       } else {
-        instance = opts => service.$http({ ...opts, url: joinRootAndPath(root, opts.url )})
+        instance = opts => service.$http({ ...opts, url: joinRootAndPath(root, opts.url) })
       }
       instance.baseURL = root
 
@@ -236,7 +235,7 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
        * @param {Object} configs 请求配置项
        */
       return (urlData, params, configs) => 
-        request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs})
+        request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs })
     },
     restFulPost: function axiosServicePost (restFulUrl, requestOpts, moreConfigs) {
       const request = wrapperRequest(requestOpts)
@@ -279,6 +278,20 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
   return requests
 }
 
+/**
+ * mock装饰器
+ * @param {Function} mock mock的具体逻辑
+ * @return {Function} 接收api的函数
+ */
+export const mockDecorator = mock => api => (...args) => {
+  if (UN_PRODUCTION) {
+    return mock(...args)
+  } else {
+    return api(...args)
+  }
+}
+
 service.getRequestsByRoot = getRequestsByRoot
+
 
 export default service

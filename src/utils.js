@@ -86,20 +86,20 @@ export function forEach (obj, fn) {
 
   // Force an array if not already something iterable
   if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
+    /* eslint no-param-reassign:0 */
     obj = [obj]
   }
 
   if (isArray(obj)) {
     // Iterate over array values
     for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj)
+      fn(obj[i], i, obj)
     }
   } else {
     // Iterate over object keys
     for (var key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj)
+        fn(obj[key], key, obj)
       }
     }
   }
@@ -168,8 +168,8 @@ export function deepMerge(/* obj1, obj2, obj3, ... */) {
  * Mix properties into target object.
  */
 export const extend = function extend (to, _from) {
- for (var key in _from) {
-   to[key] = _from[key]
- }
- return to
+  for (var key in _from) {
+    to[key] = _from[key]
+  }
+  return to
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
-import axiosService from 'axios-service'
-import { getRequestsByRoot } from 'axios-service'
+import axiosService, { getRequestsByRoot } from 'axios-service'
+import { mockGetInfo } from './apis-mock'
 
 // 这里的url只是个demo, 需要根据实际场景修改为真实的url, 或者使用webpack的devServer做跨域代理
 // 如果跨域代理, root因为为 '/', 或者不填, 因为root的默认是也是 '/'
@@ -31,4 +31,8 @@ export const getGitHubUser = gitHubRestFulGet('users/$user', {
   dataKey: null
 })
 
+
+export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {
+  autoLoading: false
+}))
 

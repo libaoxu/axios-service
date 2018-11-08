@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getRequestsByRoot = exports.service = undefined;
+exports.mockDecorator = exports.getRequestsByRoot = exports.service = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -383,6 +383,18 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
   return requests;
 };
 
+var mockDecorator = exports.mockDecorator = function mockDecorator(mock) {
+  return function (api) {
+    return function () {
+      if (_config.UN_PRODUCTION) {
+        return mock.apply(undefined, arguments);
+      } else {
+        return api.apply(undefined, arguments);
+      }
+    };
+  };
+};
+
 service.getRequestsByRoot = getRequestsByRoot;
 
 exports.default = service;
@@ -478,12 +490,12 @@ function forEach(obj, fn) {
 
   if (isArray(obj)) {
     for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
+      fn(obj[i], i, obj);
     }
   } else {
     for (var key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
+        fn(obj[key], key, obj);
       }
     }
   }
@@ -555,6 +567,8 @@ var requestDefaults = exports.requestDefaults = {
 
   successCode: 0
 };
+
+var UN_PRODUCTION = exports.UN_PRODUCTION = "none" !== 'production';
 
 /***/ }),
 /* 4 */

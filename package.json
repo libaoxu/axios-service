@@ -12,9 +12,10 @@
     "example": "webpack-dev-server --config build/webpack.example.conf.js --open",
     "build:umd": "webpack --config build/webpack.prod.conf.js",
     "build:umd:min": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js",
-    "build": "npm run build:umd && npm run build:umd:min",
-    "pub": "sh build/release.sh",
-    "apiserver": "node examples/server/index.js"
+    "build": "npm run lint && npm run build:umd && npm run build:umd:min",
+    "pub": "npm run lint && sh build/release.sh",
+    "apiserver": "node examples/server/index.js",
+    "lint": "eslint src/**.js"
   },
   "repository": {
     "type": "git",

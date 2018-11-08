@@ -28,7 +28,7 @@ module.exports = merge(baseConfig, {
   devServer: {
     port: 3800,
     host: '127.0.0.1',
-    inline:true,
+    inline: true,
     hot: true,
     proxy: {
 
