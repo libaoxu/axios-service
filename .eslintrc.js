@@ -19,7 +19,8 @@ module.exports = {
   "rules": {
     "strict": 0,
     "no-unused-vars": 0,
-    "no-console": "off", "no-unused-vars": 0,
+    // "no-console": "off",
+    "no-unused-vars": 0,
     // 关闭未定义变量检测
     "no-undef": "off", 
     // 关闭强制返回检测

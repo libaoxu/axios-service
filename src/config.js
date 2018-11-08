@@ -17,5 +17,5 @@ export const requestDefaults = {
   // server端请求成功的状态, 注意: 是服务端返回的状态码, 不是xhr在浏览器端的返回状态
   successCode: 0 
 }
-console.log('process: ', process.env.NODE_ENV !== 'production')
+
 export const UN_PRODUCTION = process.env.NODE_ENV !== 'production'

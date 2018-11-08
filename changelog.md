@@ -1,3 +1,14 @@
+### 1.1.3
+*2018-11.8*
+- 去掉console.log
+- release.sh中添加git pull origin master
+
+### 1.1.2
+*2018-11.8*
+
+- package.json的scripts中, 添加lint, 对src文件进行lint校验
+- axios-service添加 mockDecorator 功能作为尝试, 在example中添加响应案例
+
 ### 1.1.1
 
 *2018-09-26*
