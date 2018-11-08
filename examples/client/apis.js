@@ -14,7 +14,8 @@ export const getInfo = get('api/getInfo', null, {
 
 export const getInfoCustom = get('/api/getInfoCustom', {
   msgKey: 'error_msg',
-  codeKey: 'dm_error'
+  codeKey: 'dm_error',
+  successCode: 0
 })
 
 export const postInfo = post('api/postInfo')

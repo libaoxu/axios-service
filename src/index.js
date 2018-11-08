@@ -4,7 +4,7 @@
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
-import { formatRestFulUrl, extend, joinRootAndPath } from './utils'
+import { formatRestFulUrl, extend, joinRootAndPath, logger } from './utils'
 import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION } from './config'
 import Service from './service'
 
@@ -49,12 +49,12 @@ const getWrapperRequestByInstance = function getWrapperRequestByInstance (instan
             if (code === successCode) {
               return Promise.resolve(apiRes)
             } else {
-              console.error(`[service请求错误], msg: ${msg}, code: ${code} `, ...requestInfo)
+              logger.error(`请求错误: msg: ${msg}, code: ${code} `, ...requestInfo)
               return Promise.reject(apiRes)
             }
           }
         }, (e) => {
-          console.error(`[service请求失败]: `, ...requestInfo)
+          logger.error(`请求失败: `, ...requestInfo)
           return Promise.reject(e)
         })
     }

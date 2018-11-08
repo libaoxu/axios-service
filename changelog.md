@@ -1,6 +1,7 @@
 ### 1.1.3
 *2018-11.8*
 - 去掉console.log
+- 添加logger修改, 修改提示信息主题为: [axios-service]
 - release.sh中添加git pull origin master
 
 ### 1.1.2
