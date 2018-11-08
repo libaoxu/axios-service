@@ -74,7 +74,7 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
   
   let tid = setTimeout(() => {
     if (!axiosInstance) {
-      console.error('请注入axios实例, 如: axiosService.init(axios, config)')
+      logger.error('请注入axios实例, 如: axiosService.init(axios, config)')
     }
   }, timeout)
   
