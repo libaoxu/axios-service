@@ -1,3 +1,19 @@
+### 1.1.4
+*2018-11.12*
+- 添加getMockDecoratorByEnv, 为mockDecorator提供注入环境变量方案, 适用性更强
+
+### 1.1.3
+*2018-11.8*
+- 去掉console.log
+- 添加logger修改, 修改提示信息主题为: [axios-service]
+- release.sh中添加git pull origin master
+
+### 1.1.2
+*2018-11.8*
+
+- package.json的scripts中, 添加lint, 对src文件进行lint校验
+- axios-service添加 mockDecorator 功能作为尝试, 在example中添加响应案例
+
 ### 1.1.1
 
 *2018-09-26*

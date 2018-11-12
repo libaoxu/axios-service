@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mockDecorator = exports.getRequestsByRoot = exports.service = undefined;
+exports.getMockDecoratorByEnv = exports.getRequestsByRoot = exports.service = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -142,16 +142,12 @@ var getWrapperRequestByInstance = function getWrapperRequestByInstance(instance)
           if (code === successCode) {
             return Promise.resolve(apiRes);
           } else {
-            var _console;
-
-            (_console = console).error.apply(_console, ['[service\u8BF7\u6C42\u9519\u8BEF], msg: ' + msg + ', code: ' + code + ' '].concat(requestInfo));
+            _utils.logger.error.apply(_utils.logger, ['\u8BF7\u6C42\u9519\u8BEF: msg: ' + msg + ', code: ' + code + ' '].concat(requestInfo));
             return Promise.reject(apiRes);
           }
         }
       }, function (e) {
-        var _console2;
-
-        (_console2 = console).error.apply(_console2, ['[service\u8BF7\u6C42\u5931\u8D25]: '].concat(requestInfo));
+        _utils.logger.error.apply(_utils.logger, ['\u8BF7\u6C42\u5931\u8D25: '].concat(requestInfo));
         return Promise.reject(e);
       });
     };
@@ -174,7 +170,7 @@ var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
 
   var tid = setTimeout(function () {
     if (!axiosInstance) {
-      console.error('请注入axios实例, 如: axiosService.init(axios, config)');
+      _utils.logger.error('请注入axios实例, 如: axiosService.init(axios, config)');
     }
   }, timeout);
 
@@ -383,13 +379,26 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
   return requests;
 };
 
-var mockDecorator = exports.mockDecorator = function mockDecorator(mock) {
-  return function (api) {
-    return function () {
-      if (_config.UN_PRODUCTION) {
-        return mock.apply(undefined, arguments);
+var getMockDecoratorByEnv = exports.getMockDecoratorByEnv = function getMockDecoratorByEnv(isDev) {
+  return function mockDecorator(mockFn) {
+    return function apiDecorator(target, property, descriptor) {
+      var apiFn = void 0;
+      var applyApiWithEnv = function applyApiWithEnv() {
+        if (isDev) {
+          return mockFn.apply(undefined, arguments);
+        } else {
+          return apiFn.apply(undefined, arguments);
+        }
+      };
+      if (!descriptor && typeof target === 'function') {
+        apiFn = target;
+        return applyApiWithEnv;
       } else {
-        return api.apply(undefined, arguments);
+        apiFn = descriptor.initializer || descriptor.value;
+        descriptor.initializer = descriptor.value = function (_) {
+          return applyApiWithEnv;
+        };
+        return descriptor;
       }
     };
   };
@@ -542,6 +551,27 @@ var extend = exports.extend = function extend(to, _from) {
   return to;
 };
 
+var logger = exports.logger = {
+  log: function log() {
+    var _console;
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    (_console = console).log.apply(_console, ['[axios-service]'].concat(args));
+  },
+  error: function error() {
+    var _console2;
+
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    (_console2 = console).error.apply(_console2, ['[axios-service]'].concat(args));
+  }
+};
+
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -567,8 +597,6 @@ var requestDefaults = exports.requestDefaults = {
 
   successCode: 0
 };
-console.log('process: ', "none" !== 'production');
-var UN_PRODUCTION = exports.UN_PRODUCTION = "none" !== 'production';
 
 /***/ }),
 /* 4 */
@@ -580,6 +608,7 @@ var UN_PRODUCTION = exports.UN_PRODUCTION = "none" !== 'production';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 

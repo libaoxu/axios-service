@@ -173,3 +173,16 @@ export const extend = function extend (to, _from) {
   }
   return to
 }
+
+export const logger = {
+  log (...args) {
+    /* eslint-disable no-console */
+    console.log('[axios-service]', ...args)
+    /* eslint-enable no-console */
+  },
+  error (...args) {
+    /* eslint-disable no-console */
+    console.error('[axios-service]', ...args)
+    /* eslint-enable no-console */
+  },
+}

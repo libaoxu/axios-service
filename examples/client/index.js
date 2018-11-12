@@ -1,5 +1,5 @@
 import axiosService from 'axios-service'
-import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock } from './apis'
+import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis } from './apis'
 import jsonp from 'jsonp'
 import axios from 'axios'
 
@@ -56,6 +56,7 @@ const postXForm = _ => postXFormWithStaticHeader({ name: 'libaoxu' })
 const restFulDemo = _ => getGitHubUser({ user: 'libaoxu' })
 
 const normalGetInfoMock = _ => getInfoWithMock()
+const normalGetInfoMockByClass = _ => apis.getInfoWithMock()
 
 
 function jsonpDemo () {
@@ -92,7 +93,15 @@ const requestChains = [
   {
     text: '普通get请求的mock',
     fn: normalGetInfoMock
-  }
+  },
+  {
+    text: '普通get请求的mock',
+    fn: normalGetInfoMock
+  },
+  {
+    text: '用类的装饰器方案, 做普通get请求的mock',
+    fn: normalGetInfoMockByClass
+  },
 ]
 
 const rootEl = document.getElementById('root')

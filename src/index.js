@@ -4,7 +4,7 @@
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
-import { formatRestFulUrl, extend, joinRootAndPath } from './utils'
+import { formatRestFulUrl, extend, joinRootAndPath, logger } from './utils'
 import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION } from './config'
 import Service from './service'
 
@@ -49,12 +49,12 @@ const getWrapperRequestByInstance = function getWrapperRequestByInstance (instan
             if (code === successCode) {
               return Promise.resolve(apiRes)
             } else {
-              console.error(`[service请求错误], msg: ${msg}, code: ${code} `, ...requestInfo)
+              logger.error(`请求错误: msg: ${msg}, code: ${code} `, ...requestInfo)
               return Promise.reject(apiRes)
             }
           }
         }, (e) => {
-          console.error(`[service请求失败]: `, ...requestInfo)
+          logger.error(`请求失败: `, ...requestInfo)
           return Promise.reject(e)
         })
     }
@@ -74,7 +74,7 @@ const wrapperRequsetAdaptor = function wrapperRequsetAdaptor (baseConfigs) {
   
   let tid = setTimeout(() => {
     if (!axiosInstance) {
-      console.error('请注入axios实例, 如: axiosService.init(axios, config)')
+      logger.error('请注入axios实例, 如: axiosService.init(axios, config)')
     }
   }, timeout)
   
@@ -279,15 +279,43 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
 }
 
 /**
- * mock装饰器
- * @param {Function} mock mock的具体逻辑
- * @return {Function} 接收api的函数
+ * 通过环境变量获取mock装饰器
+ * @param {String} isDev 是否为开发环境
+ * @return {Function}
  */
-export const mockDecorator = mock => api => (...args) => {
-  if (UN_PRODUCTION) {
-    return mock(...args)
-  } else {
-    return api(...args)
+export const getMockDecoratorByEnv = isDev => {
+  /**
+   * mock装饰器
+   * @param {Function} mockFn mock的函数逻辑
+   * @return {Function}
+   */
+  return function mockDecorator (mockFn) {
+    /**
+     * 接口装饰器
+     * @param {Class|Function} 所装饰类的实例对象 | 所装饰器的函数
+     * @param {String|Undefined} property 属性的key名|Undefined
+     * @param {Object|Undefined} descriptor es6装饰器对象|Undefined
+     * @return {Object|Function} es6的装饰器对象|直接可执行函数
+     */
+    return function apiDecorator (target, property, descriptor) {
+      let apiFn
+      const applyApiWithEnv = (...args) => {
+        // 开发环境走mock, 如果需要关闭, 需要再apis种删除
+        if (isDev) {
+          return mockFn(...args)
+        } else {
+          return apiFn(...args)
+        }
+      }
+      if (!descriptor && typeof target === 'function') {
+        apiFn = target
+        return applyApiWithEnv
+      } else {
+        apiFn = descriptor.initializer || descriptor.value
+        descriptor.initializer = descriptor.value = _ => applyApiWithEnv
+        return descriptor
+      }
+    }
   }
 }
 

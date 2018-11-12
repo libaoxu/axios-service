@@ -1,5 +1,7 @@
 
-import { mockDecorator } from 'axios-service'
+import { getMockDecoratorByEnv } from 'axios-service'
+
+const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV)
 
 export const mockGetInfo = mockDecorator((...args) => {
   return Promise.resolve({
