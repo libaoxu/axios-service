@@ -34,11 +34,13 @@ axiosService.init(axios, {
 
 ### 参数介绍
 
-[getRequestsByRoot参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L166)
+[getRequestsByRoot参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L165)
 
 [get参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L179)
 
-[restFulGet参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L229)
+[restFulGet参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L230)
+
+[getMockDecoratorByEnv参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L286)
 
 ### apis配置示例
 > 注意: 上面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
