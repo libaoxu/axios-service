@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mockDecorator = exports.getRequestsByRoot = exports.service = undefined;
+exports.getMockDecoratorByEnv = exports.getRequestsByRoot = exports.service = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -379,13 +379,26 @@ var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot()
   return requests;
 };
 
-var mockDecorator = exports.mockDecorator = function mockDecorator(mock) {
-  return function (api) {
-    return function () {
-      if (_config.UN_PRODUCTION) {
-        return mock.apply(undefined, arguments);
+var getMockDecoratorByEnv = exports.getMockDecoratorByEnv = function getMockDecoratorByEnv(isDev) {
+  return function mockDecorator(mockFn) {
+    return function apiDecorator(target, property, descriptor) {
+      var apiFn = void 0;
+      var applyApiWithEnv = function applyApiWithEnv() {
+        if (isDev) {
+          return mockFn.apply(undefined, arguments);
+        } else {
+          return apiFn.apply(undefined, arguments);
+        }
+      };
+      if (!descriptor && typeof target === 'function') {
+        apiFn = target;
+        return applyApiWithEnv;
       } else {
-        return api.apply(undefined, arguments);
+        apiFn = descriptor.initializer || descriptor.value;
+        descriptor.initializer = descriptor.value = function (_) {
+          return applyApiWithEnv;
+        };
+        return descriptor;
       }
     };
   };
@@ -585,8 +598,6 @@ var requestDefaults = exports.requestDefaults = {
   successCode: 0
 };
 
-var UN_PRODUCTION = exports.UN_PRODUCTION = "none" !== 'production';
-
 /***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -597,6 +608,7 @@ var UN_PRODUCTION = exports.UN_PRODUCTION = "none" !== 'production';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 

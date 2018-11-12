@@ -284,7 +284,6 @@ export const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
  * @return {Function}
  */
 export const getMockDecoratorByEnv = isDev => {
-
   /**
    * mock装饰器
    * @param {Function} mockFn mock的函数逻辑
