@@ -161,7 +161,7 @@ getHost({
 ```js
 import { getMockDecoratorByEnv } from 'axios-service'
 
-// 传入的值为: 是否为开发环境. 该变量是做一层保障, 在[生产模式]会走真是接口, [开发环境]走mock 以防忘记关闭mock而打包上线, 导致线上请求mock数据的情况
+// 传入的值为: 是否为开发环境. 该变量是做一层保障, 在[生产模式]会走直接口, [开发环境]走mock数据, 以防忘记关闭mock而打包上线, 导致线上请求mock数据的情况
 // web项目
 const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
 // react-native项目
