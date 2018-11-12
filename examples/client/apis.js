@@ -37,3 +37,12 @@ export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {
   autoLoading: false
 }))
 
+class Apis {
+  @mockGetInfo
+  getInfoWithMock = get('api/getInfo', null, {
+    autoLoading: false
+  })
+}
+
+export const apis = new Apis()
+

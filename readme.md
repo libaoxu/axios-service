@@ -40,7 +40,7 @@ axiosService.init(axios, {
 
 [restFulGet参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L229)
 
-### apis配置
+### apis配置示例
 > 注意: 上面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
 
 ```js
@@ -89,6 +89,7 @@ const atomPromise = new Promise((resolve, reject) => {
 })
 const asyncAddUidToApi = fn => params => atomPromise.then(({ uid, sid }) => fn({ ...params, uid, sid }))
 export const asyncPostPeInfo = asyncAddUidToApi(peUserLoginPost)
+
 ```
 
 具体使用
@@ -113,7 +114,6 @@ getInfo({
   })
 
 ```
-
 
 
 ### restFul配置
@@ -146,6 +146,48 @@ getHost({
   }, (e) => {
     console.log(e)
   })
+
+```
+
+
+### 接口mock
+> 注意: axios-service与axios-mock-adapter并没有冲突, 只是 axios-mock-adapter一旦使用, 全局所有接口都要进行mock, 本库提供的mock装饰器方案, **可以针对需要mock的接口单独做简单mock**, 适合大型项目中, 依赖的其他相关接口过多, 维护其他mock工作量过多情况
+```js
+import { getMockDecoratorByEnv } from 'axios-service'
+
+// 环境变量是做一层保障, 再打包之后会走真是接口, 以防忘记关闭mock而打包上线的情况
+const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV)
+
+// 如果页面复杂, mock相关
+const mockGetInfo = mockDecorator((...args) => {
+  return Promise.resolve({
+    'code': 0,
+    'message': 'success',
+    'data': {
+      'name': '李宝旭 mock',
+      'name_en': 'libaoxu by mock',
+      'email': 'libaoxu520@gmail.com',
+      'github': 'https://github.com/libaoxu'
+    },
+    'msg': 'success'
+  })
+})
+
+// 包裹函数的写法
+export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {
+  autoLoading: false
+}))
+
+
+// 类装饰器的写法
+class Apis {
+  @mockGetInfo
+  getInfoWithMock = get('api/getInfo', null, {
+    autoLoading: false
+  })
+}
+
+export default new Apis()
 
 ```
 

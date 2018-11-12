@@ -1,3 +1,7 @@
+### 1.1.4
+*2018-11.12*
+- 添加getMockDecoratorByEnv, 为mockDecorator提供注入环境变量方案, 适用性更强
+
 ### 1.1.3
 *2018-11.8*
 - 去掉console.log
