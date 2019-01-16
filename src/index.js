@@ -311,7 +311,8 @@ export const getMockDecoratorByEnv = isDev => {
         apiFn = target
         return applyApiWithEnv
       } else {
-        apiFn = descriptor.initializer || descriptor.value
+        const initialFunc = descriptor.initializer || descriptor.value
+        apiFn = initialFunc() || (() => {})
         descriptor.initializer = descriptor.value = _ => applyApiWithEnv
         return descriptor
       }

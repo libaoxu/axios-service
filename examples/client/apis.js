@@ -33,15 +33,11 @@ export const getGitHubUser = gitHubRestFulGet('users/$user', {
 })
 
 
-export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {
-  autoLoading: false
-}))
+export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {}))
 
 class Apis {
   @mockGetInfo
-  getInfoWithMock = get('api/getInfo', null, {
-    autoLoading: false
-  })
+  getInfoWithMock = get('api/getInfo', null, {})
 }
 
 export const apis = new Apis()

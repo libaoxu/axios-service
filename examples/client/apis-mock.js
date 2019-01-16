@@ -1,7 +1,8 @@
 
 import { getMockDecoratorByEnv } from 'axios-service'
 
-const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
+// const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
+const mockDecorator = getMockDecoratorByEnv(false)
 
 export const mockGetInfo = mockDecorator((...args) => {
   return Promise.resolve({
@@ -10,8 +11,8 @@ export const mockGetInfo = mockDecorator((...args) => {
     'data': {
       'name': '李宝旭 mock',
       'name_en': 'libaoxu by mock',
-      'email': 'libaoxu520@gmail.com',
-      'github': 'https://github.com/libaoxu'
+      'email': 'libaoxu520@gmail.com mock',
+      'github': 'https://github.com/libaoxu mock'
     },
     'msg': 'success'
   })

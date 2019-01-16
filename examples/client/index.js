@@ -95,10 +95,6 @@ const requestChains = [
     fn: normalGetInfoMock
   },
   {
-    text: '普通get请求的mock',
-    fn: normalGetInfoMock
-  },
-  {
     text: '用类的装饰器方案, 做普通get请求的mock',
     fn: normalGetInfoMockByClass
   },

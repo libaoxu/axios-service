@@ -1,3 +1,7 @@
+### 1.1.5
+*2019-1.16*
+- 修复获取apiFn的方案, 兼容普通函数和descriptor.initializer || descriptor.value获取装饰函数两种case
+
 ### 1.1.4
 *2018-11.12*
 - 添加getMockDecoratorByEnv, 为mockDecorator提供注入环境变量方案, 适用性更强

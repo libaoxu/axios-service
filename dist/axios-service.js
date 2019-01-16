@@ -394,7 +394,8 @@ var getMockDecoratorByEnv = exports.getMockDecoratorByEnv = function getMockDeco
         apiFn = target;
         return applyApiWithEnv;
       } else {
-        apiFn = descriptor.initializer || descriptor.value;
+        var initialFunc = descriptor.initializer || descriptor.value;
+        apiFn = initialFunc() || function () {};
         descriptor.initializer = descriptor.value = function (_) {
           return applyApiWithEnv;
         };
