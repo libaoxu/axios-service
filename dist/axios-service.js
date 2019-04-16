@@ -90,40 +90,110 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getMockDecoratorByEnv = exports.getRequestsByRoot = exports.service = undefined;
+exports.getRequestsByRoot = exports.createAxiosService = exports.getMockDecoratorByEnv = undefined;
+
+var _mockDecorator = __webpack_require__(1);
+
+Object.defineProperty(exports, 'getMockDecoratorByEnv', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_mockDecorator).default;
+  }
+});
+
+var _create = __webpack_require__(2);
+
+var _create2 = _interopRequireDefault(_create);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var axiosService = (0, _create2.default)();
+
+exports.createAxiosService = _create2.default;
+var getRequestsByRoot = exports.getRequestsByRoot = axiosService.getRequestsByRoot;
+
+exports.default = axiosService;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = getMockDecoratorByEnv;
+function getMockDecoratorByEnv(isDev) {
+  return function mockDecorator(mockFn) {
+    return function apiDecorator(target, property, descriptor) {
+      var apiFn = void 0;
+      var applyApiWithEnv = function applyApiWithEnv() {
+        if (isDev) {
+          return mockFn.apply(undefined, arguments);
+        } else {
+          return apiFn.apply(undefined, arguments);
+        }
+      };
+      if (!descriptor && typeof target === 'function') {
+        apiFn = target;
+        return applyApiWithEnv;
+      } else {
+        var initialFunc = descriptor.initializer || descriptor.value;
+        apiFn = initialFunc() || function () {};
+        descriptor.initializer = descriptor.value = function (_) {
+          return applyApiWithEnv;
+        };
+        return descriptor;
+      }
+    };
+  };
+}
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _requestTypes = __webpack_require__(1);
+var _requestTypes = __webpack_require__(3);
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(4);
 
-var _config = __webpack_require__(3);
+var _config = __webpack_require__(5);
 
-var _service = __webpack_require__(4);
+var _service = __webpack_require__(6);
 
 var _service2 = _interopRequireDefault(_service);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var service = exports.service = new _service2.default({
-  requestDefaults: _config.requestDefaults,
-  createdRequestStack: [],
-  createdAxiosInstanceStack: []
-});
+function createAxiosService() {
+  var service = new _service2.default({
+    requestDefaults: _config.requestDefaults,
+    createdRequestStack: [],
+    createdAxiosInstanceStack: []
+  });
 
-var getWrapperRequestByInstance = function getWrapperRequestByInstance(instance) {
-  return function getRequestWithOptions(requestOpts) {
+  var responseDecorator = function responseDecorator(instance, requestOpts) {
     var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
         msgKey = _service$requestDefau.msgKey,
         codeKey = _service$requestDefau.codeKey,
         dataKey = _service$requestDefau.dataKey,
         successCode = _service$requestDefau.successCode;
 
-    return function request(opts) {
-      var requestInfo = ['url: ' + instance.baseURL + opts.url, ', params:', opts.params, ', data:', opts.data];
+    return function request(config) {
+      var requestInfo = ['url: ' + instance.baseURL + config.url, ', params:', config.params, ', data:', config.data];
 
-      return instance(opts).then(function (response) {
+      return instance(config).then(function (response) {
         var status = response.status,
             apiRes = response.data,
             config = response.config;
@@ -152,265 +222,238 @@ var getWrapperRequestByInstance = function getWrapperRequestByInstance(instance)
       });
     };
   };
-};
+  var handleAxiosInstances = function handleAxiosInstances(baseConfigs) {
+    var defaultBaseCopy = (0, _utils.extend)({}, _config.defaultBaseConfig);
 
-var wrapperRequsetAdaptor = function wrapperRequsetAdaptor(baseConfigs) {
-  var _baseConfigs$root = baseConfigs.root,
-      root = _baseConfigs$root === undefined ? '/' : _baseConfigs$root,
-      isCreateInstance = baseConfigs.isCreateInstance;
+    var _extend = (0, _utils.extend)(defaultBaseCopy, baseConfigs),
+        root = _extend.root,
+        isCreateInstance = _extend.isCreateInstance;
 
-  var axiosInstance = void 0;
-  var asyncAxiosInstance = void 0;
-  var _request = void 0;
-  var $httpResolve = void 0;
-  var timeout = 3000;
-  var $httpReady = new Promise(function (resolve, reject) {
-    $httpResolve = resolve;
-  });
-
-  var tid = setTimeout(function () {
-    if (!axiosInstance) {
-      _utils.logger.error('请注入axios实例, 如: axiosService.init(axios, config)');
-    }
-  }, timeout);
-
-  var getInstance = function getInstance() {
-    if (service.$http) {
-      clearTimeout(tid);
-      var instance = void 0;
-
-      if (isCreateInstance) {
-        instance = service.$http.create(_extends({
-          baseURL: root
-        }, baseConfigs));
-      } else {
-        instance = function instance(opts) {
-          return service.$http(_extends({}, opts, { url: (0, _utils.joinRootAndPath)(root, opts.url) }));
-        };
-      }
-      instance.baseURL = root;
-
-      return instance;
-    }
-  };
-
-  var getInstaceSync = function getInstaceSync() {
-    if (!service.$http) {
-      service.createdAxiosInstanceStack.push($httpResolve);
-      return $httpReady.then(getInstance);
-    }
-  };
-
-  var getRequest = function getRequest(axiosInstance, requestOpts) {
-    var _getRequestByOpts = getWrapperRequestByInstance(axiosInstance);
-    return _getRequestByOpts(requestOpts);
-  };
-
-  axiosInstance = getInstance();
-
-  if (!axiosInstance) {
-    asyncAxiosInstance = getInstaceSync();
-    asyncAxiosInstance.then(function (_axiosInstance) {
-      axiosInstance = _axiosInstance;
-    });
-  }
-
-  var wrapperRequest = function wrapperRequest(requestOpts) {
+    var axiosInstance = void 0;
+    var asyncAxiosInstance = void 0;
     var _request = void 0;
-    if (axiosInstance) {
-      _request = getRequest(axiosInstance, requestOpts);
-    } else {
-      asyncAxiosInstance && asyncAxiosInstance.then(function (axiosInstance) {
-        _request = getRequest(axiosInstance, requestOpts);
+    var $httpResolve = void 0;
+    var timeout = 3000;
+    var $httpReady = new Promise(function (resolve, reject) {
+      $httpResolve = resolve;
+    });
+
+    var tid = setTimeout(function () {
+      if (!axiosInstance) {
+        _utils.logger.error('请注入axios实例, 如: axiosService.init(axios, config)');
+      }
+    }, timeout);
+
+    var getInstance = function getInstance() {
+      if (service.$http) {
+        clearTimeout(tid);
+        var instance = void 0;
+
+        if (isCreateInstance) {
+          instance = service.$http.create(_extends({
+            baseURL: root
+          }, baseConfigs));
+        } else {
+          instance = function instance(config) {
+            return service.$http(_extends({}, config, { url: (0, _utils.joinRootAndPath)(root, config.url) }));
+          };
+        }
+        instance.baseURL = root;
+
+        return instance;
+      }
+    };
+
+    var getInstaceSync = function getInstaceSync() {
+      if (!service.$http) {
+        service.createdAxiosInstanceStack.push($httpResolve);
+        return $httpReady.then(getInstance);
+      }
+    };
+
+    axiosInstance = getInstance();
+
+    if (!axiosInstance) {
+      asyncAxiosInstance = getInstaceSync();
+      asyncAxiosInstance.then(function (_axiosInstance) {
+        axiosInstance = _axiosInstance;
       });
     }
 
-    return function requestDecorator() {
-      for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
-        params[_key] = arguments[_key];
+    return {
+      getAxiosInstance: function getAxiosInstance(_) {
+        return axiosInstance;
+      },
+      getAsyncAxiosInstance: function getAsyncAxiosInstance(_) {
+        return asyncAxiosInstance;
       }
+    };
+  };
 
-      if (_request) {
-        return _request.apply(undefined, params);
+  var jsonWrapperRequest = function jsonWrapperRequest(baseConfigs) {
+    return function getRequest(config) {};
+  };
+
+  var getRequestsByRoot = function getRequestsByRoot() {
+    var baseConfigs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    var _handleAxiosInstances = handleAxiosInstances(baseConfigs),
+        getAxiosInstance = _handleAxiosInstances.getAxiosInstance,
+        getAsyncAxiosInstance = _handleAxiosInstances.getAsyncAxiosInstance;
+
+    var getRequest = function getRequest(requestOpts) {
+      var _request = void 0;
+      var axiosInstance = getAxiosInstance();
+      var asyncAxiosInstance = getAsyncAxiosInstance();
+
+      if (axiosInstance) {
+        _request = responseDecorator(axiosInstance, requestOpts);
       } else {
-        return asyncAxiosInstance.then(function () {
-          return _request.apply(undefined, params);
+        asyncAxiosInstance && asyncAxiosInstance.then(function (axiosInstance) {
+          _request = responseDecorator(axiosInstance, requestOpts);
         });
       }
-    };
-  };
 
-  return {
-    getAxiosInstance: function getAxiosInstance(_) {
-      return axiosInstance;
-    },
-    getAsyncAxiosInstance: function getAsyncAxiosInstance(_) {
-      return asyncAxiosInstance;
-    },
-    wrapperRequest: wrapperRequest
-  };
-};
+      return function handleRequest() {
+        for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+          params[_key] = arguments[_key];
+        }
 
-var jsonWrapperRequest = function jsonWrapperRequest(baseConfigs) {
-  return function wrapperRequest(opts) {};
-};
-
-var getRequestsByRoot = exports.getRequestsByRoot = function getRequestsByRoot() {
-  var baseConfigs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  var _wrapperRequsetAdapto = wrapperRequsetAdaptor(baseConfigs),
-      wrapperRequest = _wrapperRequsetAdapto.wrapperRequest,
-      getAxiosInstance = _wrapperRequsetAdapto.getAxiosInstance,
-      getAsyncAxiosInstance = _wrapperRequsetAdapto.getAsyncAxiosInstance;
-
-  var requests = {
-    getAxiosInstance: getAxiosInstance,
-    getAsyncAxiosInstance: getAsyncAxiosInstance,
-
-    get: function axiosServiceGet(url, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-
-      return function (params, configs) {
-        return request(_extends({ url: url, method: _requestTypes.GET, params: params }, configs, moreConfigs));
-      };
-    },
-    post: function axiosServicePost(url, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-
-      return function (data, configs) {
-        return request(_extends({ url: url, method: _requestTypes.POST, data: data }, configs, moreConfigs));
-      };
-    },
-    postXForm: function axiosServicePostXForm(url, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-      return function (data) {
-        var configs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        return request(_extends({
-          url: url,
-          method: _requestTypes.POST,
-          data: data,
-          transformRequest: [function () {
-            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-            var headers = arguments[1];
-
-
-            return Object.keys(data).reduce(function (formData, key) {
-              formData.append(key, data[key]);
-              return formData;
-            }, new FormData());
-          }],
-          headers: _extends({
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }, configs.headers)
-        }, configs, moreConfigs));
-      };
-    },
-
-    restFulGet: function axiosServiceRestFulGet(restFulUrl, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-
-      return function (urlData, params, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.GET, params: params }, configs, moreConfigs));
-      };
-    },
-    restFulPost: function axiosServicePost(restFulUrl, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-      return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.POST, data: data }, configs, moreConfigs));
-      };
-    },
-    delete: function axiosServiceDelete(restFulUrl, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-      return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.DELETE, data: data }, configs, moreConfigs));
-      };
-    },
-    put: function axiosServicePut(restFulUrl, requestOpts, moreConfigs) {
-      var request = wrapperRequest(requestOpts);
-      return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PUT, data: data }, configs, moreConfigs));
-      };
-    },
-    patch: function axiosServicePatch(restFulUrl, requestOpts) {
-      for (var _len2 = arguments.length, moreConfigs = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        moreConfigs[_key2 - 2] = arguments[_key2];
-      }
-
-      var request = wrapperRequest(requestOpts);
-      return function (urlData, data, configs) {
-        return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PATCH, data: data }, configs, moreConfigs));
-      };
-    },
-    head: function axiosServiceHead(url, requestOpts) {
-      for (var _len3 = arguments.length, moreConfigs = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-        moreConfigs[_key3 - 2] = arguments[_key3];
-      }
-
-      var request = wrapperRequest(requestOpts);
-      return function (configs) {
-        return request(_extends({ url: url, method: _requestTypes.HEAD }, configs, moreConfigs));
-      };
-    },
-    options: function axiosServiceOptions(url, requestOpts) {
-      for (var _len4 = arguments.length, moreConfigs = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
-        moreConfigs[_key4 - 2] = arguments[_key4];
-      }
-
-      var request = wrapperRequest(requestOpts);
-      return function (configs) {
-        return request(_extends({ url: url, method: _requestTypes.OPTIONS }, configs, moreConfigs));
-      };
-    },
-    request: function axiosServiceRequest(url, requestOpts) {
-      for (var _len5 = arguments.length, moreConfigs = Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
-        moreConfigs[_key5 - 2] = arguments[_key5];
-      }
-
-      var request = wrapperRequest(requestOpts);
-      return function (configs) {
-        return request(_extends({ url: url }, configs, moreConfigs));
-      };
-    },
-
-    jsonp: function axiosServiceJsonp(url, requestOpts) {}
-  };
-
-  return requests;
-};
-
-var getMockDecoratorByEnv = exports.getMockDecoratorByEnv = function getMockDecoratorByEnv(isDev) {
-  return function mockDecorator(mockFn) {
-    return function apiDecorator(target, property, descriptor) {
-      var apiFn = void 0;
-      var applyApiWithEnv = function applyApiWithEnv() {
-        if (isDev) {
-          return mockFn.apply(undefined, arguments);
+        if (_request) {
+          return _request.apply(undefined, params);
         } else {
-          return apiFn.apply(undefined, arguments);
+          return asyncAxiosInstance.then(function () {
+            return _request.apply(undefined, params);
+          });
         }
       };
-      if (!descriptor && typeof target === 'function') {
-        apiFn = target;
-        return applyApiWithEnv;
-      } else {
-        var initialFunc = descriptor.initializer || descriptor.value;
-        apiFn = initialFunc() || function () {};
-        descriptor.initializer = descriptor.value = function (_) {
-          return applyApiWithEnv;
-        };
-        return descriptor;
-      }
     };
+
+    var requestConnect = function requestConnect(fn) {
+      return function (url, requestOpts) {
+        for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+          args[_key2 - 2] = arguments[_key2];
+        }
+
+        var request = getRequest(requestOpts);
+        return fn.apply(undefined, [url, request].concat(args));
+      };
+    };
+
+    var requests = {
+      getAxiosInstance: getAxiosInstance,
+      getAsyncAxiosInstance: getAsyncAxiosInstance,
+
+      get: requestConnect(function axiosServiceGet(url, request, moreConfigs) {
+        return function (params, configs) {
+          return request(_extends({ url: url, method: _requestTypes.GET, params: params }, configs, moreConfigs));
+        };
+      }),
+      post: requestConnect(function axiosServicePost(url, request, moreConfigs) {
+        return function (data, configs) {
+          return request(_extends({ url: url, method: _requestTypes.POST, data: data }, configs, moreConfigs));
+        };
+      }),
+      postXForm: requestConnect(function axiosServicePostXForm(url, request, moreConfigs) {
+        return function (data) {
+          var configs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+          return request(_extends({
+            url: url,
+            method: _requestTypes.POST,
+            data: data,
+            transformRequest: [function () {
+              var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+              var headers = arguments[1];
+
+
+              return Object.keys(data).reduce(function (formData, key) {
+                formData.append(key, data[key]);
+                return formData;
+              }, new FormData());
+            }],
+            headers: _extends({
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }, configs.headers)
+          }, configs, moreConfigs));
+        };
+      }),
+
+      restFulGet: requestConnect(function axiosServiceRestFulGet(restFulUrl, request, moreConfigs) {
+        return function (urlData, params, configs) {
+          return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.GET, params: params }, configs, moreConfigs));
+        };
+      }),
+      restFulPost: requestConnect(function axiosServicePost(restFulUrl, request, moreConfigs) {
+        return function (urlData, data, configs) {
+          return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.POST, data: data }, configs, moreConfigs));
+        };
+      }),
+      delete: requestConnect(function axiosServiceDelete(restFulUrl, request, moreConfigs) {
+        return function (urlData, data, configs) {
+          return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.DELETE, data: data }, configs, moreConfigs));
+        };
+      }),
+      put: requestConnect(function axiosServicePut(restFulUrl, request, moreConfigs) {
+        return function (urlData, data, configs) {
+          return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PUT, data: data }, configs, moreConfigs));
+        };
+      }),
+      patch: requestConnect(function axiosServicePatch(restFulUrl, request) {
+        for (var _len3 = arguments.length, moreConfigs = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+          moreConfigs[_key3 - 2] = arguments[_key3];
+        }
+
+        return function (urlData, data, configs) {
+          return request(_extends({ url: (0, _utils.formatRestFulUrl)(restFulUrl, urlData), method: _requestTypes.PATCH, data: data }, configs, moreConfigs));
+        };
+      }),
+      head: requestConnect(function axiosServiceHead(url, request) {
+        for (var _len4 = arguments.length, moreConfigs = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+          moreConfigs[_key4 - 2] = arguments[_key4];
+        }
+
+        return function (configs) {
+          return request(_extends({ url: url, method: _requestTypes.HEAD }, configs, moreConfigs));
+        };
+      }),
+      options: requestConnect(function axiosServiceOptions(url, request) {
+        for (var _len5 = arguments.length, moreConfigs = Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
+          moreConfigs[_key5 - 2] = arguments[_key5];
+        }
+
+        return function (configs) {
+          return request(_extends({ url: url, method: _requestTypes.OPTIONS }, configs, moreConfigs));
+        };
+      }),
+      request: requestConnect(function axiosServiceRequest(url, request) {
+        for (var _len6 = arguments.length, moreConfigs = Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
+          moreConfigs[_key6 - 2] = arguments[_key6];
+        }
+
+        return function (configs) {
+          return request(_extends({ url: url }, configs, moreConfigs));
+        };
+      }),
+
+      jsonp: requestConnect(function axiosServiceJsonp(url, request) {})
+    };
+
+    requests.restFulDelete = requests.delete;
+
+    return requests;
   };
-};
 
-service.getRequestsByRoot = getRequestsByRoot;
+  service.getRequestsByRoot = getRequestsByRoot;
+  service.create = createAxiosService;
 
-exports.default = service;
+  return service;
+}
+
+exports.default = createAxiosService;
 
 /***/ }),
-/* 1 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -428,7 +471,7 @@ var PATCH = exports.PATCH = 'patch';
 var HEAD = exports.HEAD = 'head';
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -574,7 +617,7 @@ var logger = exports.logger = {
 };
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -586,6 +629,11 @@ Object.defineProperty(exports, "__esModule", {
 var STATUS_200 = exports.STATUS_200 = 200;
 
 var defaults = exports.defaults = {};
+
+var defaultBaseConfig = exports.defaultBaseConfig = {
+  root: '/',
+  isCreateInstance: false
+};
 
 var requestDefaults = exports.requestDefaults = {
   autoLoading: true,
@@ -600,7 +648,7 @@ var requestDefaults = exports.requestDefaults = {
 };
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -615,9 +663,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _config = __webpack_require__(3);
+var _config = __webpack_require__(5);
 
-var _utils = __webpack_require__(2);
+var _utils = __webpack_require__(4);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
