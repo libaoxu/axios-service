@@ -5,6 +5,11 @@ export const defaults = {
   // withCredentials: true
 }
 
+export const defaultBaseConfig = {
+  root: '/',
+  isCreateInstance: false
+}
+
 export const requestDefaults = {
   // todo
   autoLoading: true,

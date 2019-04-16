@@ -158,9 +158,12 @@ getHost({
 
 
 ### 接口mock
-> axios-service与axios-mock-adapter并没有冲突, 只是axios-mock-adapter一旦使用, 全局所有用axios请求的接口都要进行mock, 本库提供的mock装饰器方案, **可以针对需要mock的接口单独做简单mock**, 适合大型项目中, 依赖的其他不相关接口过多, 维护mock工作量过多情况
+> axios-service与axios-mock-adapter并没有冲突, 只是
 
-> 如果用类的方案,需要添加class的decorators解析器[babel-plugin-transform-decorators](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy#readme)
+1. axios-mock-adapter一旦使用, 全局所有用axios请求的接口都要进行mock, 如果大型项目, 每个接口都需要维护mock工作量成本过大, **本库提供的方案可以针对需要mock的接口单独做简单mock**, 可灵活处理
+2. 本库提供一个保险机制, 在
+
+> 本库提供两个方案, 一个是函数包裹, 一个是类的装饰器方案. 如果用类的方案,需要添加class的decorators解析器[babel-plugin-transform-decorators](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy#readme)
 
 使用案例: 
 ```js
@@ -174,17 +177,21 @@ const mockDecorator = getMockDecoratorByEnv(__DEV__)
 
 // mock相关逻辑
 const mockGetInfo = mockDecorator((...args) => {
-  return Promise.resolve({
-    'code': 0,
-    'message': 'success',
-    'data': {
-      'name': '李宝旭 mock',
-      'name_en': 'libaoxu by mock',
-      'email': 'libaoxu520@gmail.com',
-      'github': 'https://github.com/libaoxu'
-    },
-    'msg': 'success'
-  })
+  // 这样可以在production构建阶段, 剔除掉if内部的mock代码, 减少线上包体积, 下面代码构建结果如下: if(false) { var mockjs; }
+  if (process.env.NODE_ENV === 'development') {
+    const mockjs = require('mockjs')
+    return Promise.resolve({
+      'code': 0,
+      'message': 'success',
+      'data': {
+        'name': '李宝旭 mock',
+        'name_en': 'libaoxu by mock',
+        'email': 'libaoxu520@gmail.com',
+        'github': 'https://github.com/libaoxu'
+      },
+      'msg': 'success'
+    })
+  }
 })
 
 // 包裹函数的写法

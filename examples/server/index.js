@@ -9,7 +9,7 @@ function listDirs(root) {
   var files = fs.readdirSync(root);
   var dirs = [];
 
-  for (var i=0, l=files.length; i<l; i++) {
+  for (var i = 0, l = files.length; i < l; i++) {
     var file = files[i];
     if (file[0] !== '.') {
       var stat = fs.statSync(path.join(root, file));
@@ -52,14 +52,15 @@ dirs = listDirs(__dirname);
 
 server = http.createServer(function (req, res) {
   var url = req.url;
-  
+  var origin = req.headers.origin
+
   var writeHead = res.writeHead.bind(res)
 
   res.writeHead = function (status, params) {
     writeHead(status, Object.assign({
       'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Credentials': true,     
-      'Access-Control-Allow-Origin': 'http://127.0.0.1:3800',
+      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, ticket',
       'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS',
     }, params || {}))
@@ -74,4 +75,4 @@ server = http.createServer(function (req, res) {
 });
 
 server.listen(3801);
-console.log('api ready!')
+console.log('api ready! listen on: http://localhost:3801')

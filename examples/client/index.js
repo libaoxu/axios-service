@@ -2,6 +2,7 @@ import axiosService from 'axios-service'
 import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis } from './apis'
 import jsonp from 'jsonp'
 import axios from 'axios'
+import { axiosServiceCreateGetInfo } from './axios-service-create';
 
 // todo 全局的loading队列
 axios.interceptors.request.use(function (e) {
@@ -58,7 +59,6 @@ const restFulDemo = _ => getGitHubUser({ user: 'libaoxu' })
 const normalGetInfoMock = _ => getInfoWithMock()
 const normalGetInfoMockByClass = _ => apis.getInfoWithMock()
 
-
 function jsonpDemo () {
   jsonp('https://suggest.taobao.com/sug', {
     param: 'q=love&callback',
@@ -98,6 +98,10 @@ const requestChains = [
     text: '用类的装饰器方案, 做普通get请求的mock',
     fn: normalGetInfoMockByClass
   },
+  {
+    text: 'axiosService.create',
+    fn: axiosServiceCreateGetInfo
+  }
 ]
 
 const rootEl = document.getElementById('root')

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "example": "webpack-dev-server --config build/webpack.example.conf.js --open",
+    "example": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.example.conf.js --open",
     "build:umd": "webpack --config build/webpack.prod.conf.js",
     "build:umd:min": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js",
     "build": "npm run lint && npm run build:umd && npm run build:umd:min",

@@ -1,3 +1,11 @@
+### 1.2.0
+*2019-04-16*
+- 增加axiosService增加create函数, 支持创建多个axiosService对象, [axiosService.create](./src/create.js#288), [examples](./examples/client/axios-service-create.js)
+- 添加requestConnect高级函数, 简化相同逻辑, [requestConnect](./src/create.js#L172)
+- 优化create内部结构, 解除无必要闭包, 优化内部逻辑耦合
+- requests下添加restFulDelete, 原有delete保持不变, [restFulDelete](./src/create.js#L282)
+- 拆分mockDecorator, 如: [mock-decorator](./src/mock-decorator.js)
+
 ### 1.1.5
 *2019-1.16*
 - 修复获取apiFn的方案, 兼容普通函数和descriptor.initializer || descriptor.value获取装饰函数两种case
