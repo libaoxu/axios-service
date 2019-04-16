@@ -20,6 +20,9 @@ then
   # commit
   git add -A
   git commit -m "[build] $VERSION"
+
+  # 设置sign-git-tag 为false, 否则会报gpg failed to sign the data
+  npm config set sign-git-tag false
   npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
 
   if [[ -z $RELEASE_TAG ]]; then
