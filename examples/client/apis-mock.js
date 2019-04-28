@@ -20,3 +20,24 @@ export const mockGetInfo = mockDecorator((...args) => {
     })
   }
 })
+
+export const mockSuccess = mockDecorator((...args) => {
+  if (process.env.NODE_ENV === 'development') {
+    return Promise.resolve({
+      'code': 0,
+      'message': 'success',
+      data: '恭喜你, 请求成功'
+    })
+  }
+})
+
+export const mockFail = mockDecorator((...args) => {
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line prefer-promise-reject-errors
+    return Promise.reject({
+      'code': 10000,
+      'message': '抱歉, 请求失败',
+      'data': 'sorry mock data is error'
+    })
+  }
+})

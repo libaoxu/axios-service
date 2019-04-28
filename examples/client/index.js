@@ -99,6 +99,14 @@ const requestChains = [
     fn: normalGetInfoMockByClass
   },
   {
+    text: '预制请求消息提示的装饰器: 类写法',
+    fn: apis.getInfoWithMesageDecorator
+  },
+  {
+    text: '预制请求消息提示的装饰器: 函数式写法',
+    fn: apis.getInfoFailWithDecorators
+  },
+  {
     text: 'axiosService.create',
     fn: axiosServiceCreateGetInfo
   }
@@ -131,7 +139,11 @@ const bindEvents = function () {
 
       requestInfo.fn().then(data => {
         console.log(requestInfo.text, data)
-        resultInfoElem.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`
+        resultInfoElem.innerHTML = `<pre style="color: limegreen;">${JSON.stringify(data, null, 2)}</pre>`
+      }, error => {
+        if (error) {
+          resultInfoElem.innerHTML = `<pre style="color: red;">${JSON.stringify(error, null, 2)}</pre>`
+        }
       })
     }
   })

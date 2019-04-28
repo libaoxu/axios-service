@@ -39,13 +39,19 @@ axiosService.init(axios, {
 
 ### 参数介绍
 
-[getRequestsByRoot参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L165)
+[getRequestsByRoot参数介绍](./src/create.js#L136)
 
-[get参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L179)
+[get参数介绍](./src/create.js#L189)
 
-[restFulGet参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L230)
+[restFulGet参数介绍](./src/create.js#L235)
 
-[getMockDecoratorByEnv参数介绍](https://github.com/libaoxu/axios-service/blob/master/src/index.js#L286)
+[getMockDecoratorByEnv参数介绍](./src/service-decorators.js#L5)
+
+[getMessageDecorator参数介绍](./src/service-decorators.js#L5)
+
+[service-decorators装饰规范](./src/service-decorators.js)
+
+[更多apis用法及使用示例](./examples/client/apis.js)
 
 ### apis配置示例
 > 注意: 上面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
@@ -212,9 +218,66 @@ export default new Apis()
 
 ```
 
-### 启动示例
+### 消息装饰器
+
+```js
+import { getMesageDecorator } from 'axios-service'
+import { compose } from 'redux'
+
+const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
+
+/**
+ * 实际项目中应该替换 success 和 erorr 对应的ui函数
+ */ 
+const messageDecorator = getMessageDecorator({ success: alert, error: alert })
+
+/**
+ * 单个装饰器
+ */
+class Apis {
+  @messageDecorator({ sucessMsg: '获取用户信息请求成功', errorMsg: '获取用户信息请求失败' })
+  getInfo: get('api/getInfo')
+}
+
+/**
+ * 多个装饰器
+ */
+class Apis {
+  @messageDecorator({ sucessMsg: '获取用户信息请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
+  @mockSuccess
+  getInfo: get('api/getInfo'),
+
+  /**
+   * 函数式写法
+   */ 
+  getInfoFunc: compose(
+    messageDecorator({ sucessMsg: '请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
+    mockSuccess
+  )(get('api/getInfo'))
+}
+
+``` 
+
+未使用消息装饰器接口的写法
 ```
-// demo页
+// 如果api.getInfo被多次调用, 每次都需要写toast相关逻辑
+api.getInfo().then(() => {
+  toast.success('请求成功')
+}, () => {
+  toast.error('请求失败)  
+})
+```
+
+使用消息装饰器的用法
+```
+// 该接口使用多次之后, 不需要每次都进行消息提示
+api.getInfo()
+```
+
+
+### 启动命令示例
+```
+// api实际演示案例
 npm run example
 
 // 模拟api接口的node服务

@@ -4,15 +4,17 @@
  * @date 2018-05-08
  */
 import createAxiosService from './create'
-
-export { default as getMockDecoratorByEnv } from './mock-decorator'
+import { getMessageDecorator, getMockDecoratorByEnv } from './service-decorators'
 
 const axiosService = createAxiosService()
+const getRequestsByRoot = axiosService.getRequestsByRoot
 
 export {
+  axiosService,
+  getRequestsByRoot,
   createAxiosService,
+  getMessageDecorator,
+  getMockDecoratorByEnv,
 }
-
-export const getRequestsByRoot = axiosService.getRequestsByRoot
 
 export default axiosService

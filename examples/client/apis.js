@@ -1,6 +1,8 @@
 import axios from 'axios'
 import axiosService, { getRequestsByRoot } from 'axios-service'
-import { mockGetInfo } from './apis-mock'
+import { compose } from 'redux'
+import { mockGetInfo, mockSuccess, mockFail } from './apis-mock'
+import { messageDecorator } from './apis-message';
 
 // 这里的url只是个demo, 需要根据实际场景修改为真实的url, 或者使用webpack的devServer做跨域代理
 // 如果跨域代理, root因为为 '/', 或者不填, 因为root的默认是也是 '/'
@@ -38,6 +40,22 @@ export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {}))
 class Apis {
   @mockGetInfo
   getInfoWithMock = get('api/getInfo', null, {})
+
+  /**
+   * mockSuccess 和 mockFail之间可自由切换
+   */
+  @messageDecorator({ successMsg: '获取信息成功', errorMsg: (error) => (error && error.message) || '获取信息失败' })
+  @mockSuccess
+  // @mockFail
+  getInfoWithMesageDecorator = get('api/getInfo')
+
+  /**
+   * 函数式写法mockFail
+   */
+  getInfoFailWithDecorators = compose(
+    messageDecorator({ successMsg: '获取信息成功', errorMsg: '获取信息失败' }),
+    mockFail
+  )(get('api/getInfo'))
 }
 
 export const apis = new Apis()

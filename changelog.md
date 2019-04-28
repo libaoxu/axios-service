@@ -1,3 +1,9 @@
+### 1.2.2
+*2019-04-28*
+- 添加[service-decorators](./src/service-decorators.js), 包含mock装饰器和消息装饰器, 不管哪种装饰提供的都是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
+- 新增消息装饰器[getMessageDecorator](./src/service-decorators.js#L43), [apis-message案例](./examples/client/apis-message.js)
+- 请求接口成功或失败均添加颜色
+
 ### 1.2.0
 *2019-04-16*
 - 增加axiosService增加create函数, 支持创建多个axiosService对象, [axiosService.create](./src/create.js#288), [examples](./examples/client/axios-service-create.js)
