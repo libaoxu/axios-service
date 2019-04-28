@@ -60,6 +60,7 @@ export const getMessageDecorator = toast =>
    */
   ({ successMsg, errorMsg } = {}) => (target, name, descriptor) => {
     const noop = () => {}
+    // eslint-disable-next-line no-console
     const alert = typeof window !== 'undefined' ? window.alert : console.log
     const getToast = name => (typeof toast === 'object' && typeof toast[name] === 'function') ? toast[name] : alert
     const messageGetter = msg => (typeof msg === 'function') ? msg : _ => msg

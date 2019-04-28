@@ -90,28 +90,24 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getRequestsByRoot = exports.createAxiosService = exports.getMockDecoratorByEnv = undefined;
+exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
 
-var _mockDecorator = __webpack_require__(1);
-
-Object.defineProperty(exports, 'getMockDecoratorByEnv', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_mockDecorator).default;
-  }
-});
-
-var _create = __webpack_require__(2);
+var _create = __webpack_require__(1);
 
 var _create2 = _interopRequireDefault(_create);
+
+var _serviceDecorators = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var axiosService = (0, _create2.default)();
+var getRequestsByRoot = axiosService.getRequestsByRoot;
 
+exports.axiosService = axiosService;
+exports.getRequestsByRoot = getRequestsByRoot;
 exports.createAxiosService = _create2.default;
-var getRequestsByRoot = exports.getRequestsByRoot = axiosService.getRequestsByRoot;
-
+exports.getMessageDecorator = _serviceDecorators.getMessageDecorator;
+exports.getMockDecoratorByEnv = _serviceDecorators.getMockDecoratorByEnv;
 exports.default = axiosService;
 
 /***/ }),
@@ -124,53 +120,16 @@ exports.default = axiosService;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = getMockDecoratorByEnv;
-function getMockDecoratorByEnv(isDev) {
-  return function mockDecorator(mockFn) {
-    return function apiDecorator(target, property, descriptor) {
-      var apiFn = void 0;
-      var applyApiWithEnv = function applyApiWithEnv() {
-        if (isDev) {
-          return mockFn.apply(undefined, arguments);
-        } else {
-          return apiFn.apply(undefined, arguments);
-        }
-      };
-      if (!descriptor && typeof target === 'function') {
-        apiFn = target;
-        return applyApiWithEnv;
-      } else {
-        var initialFunc = descriptor.initializer || descriptor.value;
-        apiFn = initialFunc() || function () {};
-        descriptor.initializer = descriptor.value = function (_) {
-          return applyApiWithEnv;
-        };
-        return descriptor;
-      }
-    };
-  };
-}
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _requestTypes = __webpack_require__(3);
+var _requestTypes = __webpack_require__(2);
 
-var _utils = __webpack_require__(4);
+var _utils = __webpack_require__(3);
 
-var _config = __webpack_require__(5);
+var _config = __webpack_require__(4);
 
-var _service = __webpack_require__(6);
+var _service = __webpack_require__(5);
 
 var _service2 = _interopRequireDefault(_service);
 
@@ -453,7 +412,7 @@ function createAxiosService() {
 exports.default = createAxiosService;
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -471,7 +430,7 @@ var PATCH = exports.PATCH = 'patch';
 var HEAD = exports.HEAD = 'head';
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -617,7 +576,7 @@ var logger = exports.logger = {
 };
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -648,7 +607,7 @@ var requestDefaults = exports.requestDefaults = {
 };
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -663,9 +622,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _config = __webpack_require__(5);
+var _config = __webpack_require__(4);
 
-var _utils = __webpack_require__(4);
+var _utils = __webpack_require__(3);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -733,6 +692,98 @@ var Service = function () {
 }();
 
 exports.default = Service;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.getMockDecoratorByEnv = getMockDecoratorByEnv;
+function getMockDecoratorByEnv(isDev) {
+  return function mockDecorator(mockFn) {
+    return function apiDecorator(target, property, descriptor) {
+      var apiFn = void 0;
+      var applyApiWithEnv = function applyApiWithEnv() {
+        if (isDev) {
+          return mockFn.apply(undefined, arguments);
+        } else {
+          return apiFn.apply(undefined, arguments);
+        }
+      };
+      if (!descriptor && typeof target === 'function') {
+        apiFn = target;
+        return applyApiWithEnv;
+      } else {
+        var initialFunc = descriptor.initializer || descriptor.value;
+        apiFn = initialFunc() || function () {};
+        descriptor.initializer = descriptor.value = function (_) {
+          return applyApiWithEnv;
+        };
+        return descriptor;
+      }
+    };
+  };
+}
+
+var getMessageDecorator = exports.getMessageDecorator = function getMessageDecorator(toast) {
+  return function () {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        successMsg = _ref.successMsg,
+        errorMsg = _ref.errorMsg;
+
+    return function (target, name, descriptor) {
+      var noop = function noop() {};
+
+      var alert = typeof window !== 'undefined' ? window.alert : console.log;
+      var getToast = function getToast(name) {
+        return (typeof toast === 'undefined' ? 'undefined' : _typeof(toast)) === 'object' && typeof toast[name] === 'function' ? toast[name] : alert;
+      };
+      var messageGetter = function messageGetter(msg) {
+        return typeof msg === 'function' ? msg : function (_) {
+          return msg;
+        };
+      };
+      var successToast = getToast('success');
+      var errorToast = getToast('error');
+      var getSuccessMsg = messageGetter(successMsg);
+      var getErrorMsg = messageGetter(errorMsg);
+      var origin = void 0;
+
+      var wrapper = function wrapper() {
+        return origin.apply(undefined, arguments).then(function (res) {
+          var msg = getSuccessMsg(res);
+          msg && successToast(msg);
+          return Promise.resolve(res);
+        }, function (err) {
+          var msg = getErrorMsg(err);
+          msg && errorToast(msg);
+          return Promise.reject(err);
+        });
+      };
+
+      if (!descriptor && typeof target === 'function') {
+        origin = target;
+        return wrapper;
+      } else {
+        var initializer = descriptor.value || descriptor.initializer;
+        origin = initializer() || noop;
+        descriptor.value = descriptor.initializer = function (_) {
+          return wrapper;
+        };
+      }
+
+      return descriptor;
+    };
+  };
+};
 
 /***/ })
 /******/ ]);
