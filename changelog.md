@@ -1,4 +1,4 @@
-### 1.2.2
+### 1.2.3
 *2019-04-28*
 - 添加[service-decorators](./src/service-decorators.js), 包含mock装饰器和消息装饰器, 不管哪种装饰提供的都是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
 - 新增消息装饰器[getMessageDecorator](./src/service-decorators.js#L43), [apis-message案例](./examples/client/apis-message.js)
