@@ -219,10 +219,12 @@ export default new Apis()
 ```
 
 ### 消息装饰器
-
+> 消息装饰器是一个工具函数, 与axios-service没有关联, 可装饰任何返回Promise的函数, 该装饰器更多提供的只是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
 ```js
 import { getMesageDecorator } from 'axios-service'
+// 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
 import { compose } from 'redux'
+// const { compose } = require('ramda')
 
 const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 

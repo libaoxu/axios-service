@@ -4,6 +4,9 @@ import { compose } from 'redux'
 import { mockGetInfo, mockSuccess, mockFail } from './apis-mock'
 import { messageDecorator } from './apis-message';
 
+// 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
+// const { compose } = require('ramda')
+
 // 这里的url只是个demo, 需要根据实际场景修改为真实的url, 或者使用webpack的devServer做跨域代理
 // 如果跨域代理, root因为为 '/', 或者不填, 因为root的默认是也是 '/'
 // 注意: 这里的root是写死的demo, 实际项目可能应该根据具体环境不同, 请求不同url做不同处理
