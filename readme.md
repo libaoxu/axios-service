@@ -167,7 +167,7 @@ getHost({
 > axios-service与axios-mock-adapter并没有冲突, 只是
 
 1. axios-mock-adapter一旦使用, 全局所有用axios请求的接口都要进行mock, 如果大型项目, 每个接口都需要维护mock工作量成本过大, **本库提供的方案可以针对需要mock的接口单独做简单mock**, 可灵活处理
-2. 本库提供一个保险机制, 在
+2. 本库提供一个保险机制, 在getMockDecoratorByEnv传入一个Boolean值, 如果是`真`走mock, 如果是`假`则走针接口, 可以保证在生产环境不会被mock干扰
 
 > 本库提供两个方案, 一个是函数包裹, 一个是类的装饰器方案. 如果用类的方案,需要添加class的decorators解析器[babel-plugin-transform-decorators](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy#readme)
 
@@ -259,8 +259,8 @@ class Apis {
 ``` 
 
 未使用消息装饰器接口的写法
-```
-// 如果api.getInfo被多次调用, 每次都需要写toast相关逻辑
+```js
+// 如果api.getInfo被多次调用, 每次调用都需要写toast相关逻辑
 api.getInfo().then(() => {
   toast.success('请求成功')
 }, () => {
@@ -269,7 +269,7 @@ api.getInfo().then(() => {
 ```
 
 使用消息装饰器的用法
-```
+```js
 // 该接口使用多次之后, 不需要每次都进行消息提示
 api.getInfo()
 ```
