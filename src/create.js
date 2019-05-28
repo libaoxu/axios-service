@@ -49,8 +49,8 @@ function createAxiosService () {
             let data = apiRes[dataKey]
             let msg = apiRes[msgKey]
             let code = apiRes[codeKey]
-
-            extend(apiRes, { data, msg, code })
+        
+            extend(apiRes, { data, msg, code, message: msg })
             
             if (code === successCode) {
               return Promise.resolve(apiRes)
