@@ -54,7 +54,7 @@ axiosService.init(axios, {
 [更多apis用法及使用示例](./examples/client/apis.js)
 
 ### apis配置示例
-> 注意: 上面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
+> 注意: 下面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
 
 ```js
 
@@ -131,9 +131,10 @@ getInfo({
     ticket: 'ticket',
   }
 })
-  .then(({ data }) => {
-    // 这里的data就是成功的data, 不需要再判断
-    console.log(data)
+  // 第一个then是成功的回调, 是通过successCode和codeKey一起判断, 
+  .then(({ data, code, msg }) => {
+    // 这里的 data, code, msg这三个字段, 就是配置时候传入的dataKey, codeKey, msgKey
+    console.log(code, msg, data)
   }, (e) => {
     console.log(e)
   })
@@ -288,6 +289,8 @@ api.getInfo().then(() => {
 api.getInfo()
 ```
 
+### 更多实际演示请查看代码
+[examples](./examples/client/index.js)
 
 ### 启动命令示例
 ```
