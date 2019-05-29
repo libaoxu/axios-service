@@ -23,8 +23,9 @@ then
 
   # 设置sign-git-tag 为false, 否则会报gpg failed to sign the data
   npm config set sign-git-tag false
-  npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
-  npm publish
+  np
+  # npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
+  # npm publish
 
   # publish
   git push origin refs/tags/v$VERSION

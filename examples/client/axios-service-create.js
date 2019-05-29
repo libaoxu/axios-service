@@ -24,7 +24,7 @@ customService.init(instance, {
 // todo 全局的loading队列
 instance.interceptors.request.use(function (e) {
   // 全局拦截器, 如果apis中的getRequestsByRoot使用isCreateInstance, 就不会走全局
-  console.log('axiosCreate拦截器: ', e)
+  console.log('axiosCreate 独立实例拦截器: ', e)
   return e
 })
 

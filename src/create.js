@@ -7,6 +7,7 @@ import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
 import { formatRestFulUrl, extend, joinRootAndPath, logger } from './utils'
 import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION, defaultBaseConfig } from './config'
 import Service from './service'
+import qs from 'qs'
 
 
 function createAxiosService () {
@@ -46,11 +47,11 @@ function createAxiosService () {
             if (!dataKey) {
               return Promise.resolve(apiRes)
             }
-            let data = apiRes[dataKey]
-            let msg = apiRes[msgKey]
-            let code = apiRes[codeKey]
+            const data = apiRes[dataKey]
+            const msg = apiRes[msgKey]
+            const code = apiRes[codeKey]
 
-            extend(apiRes, { data, msg, code })
+            extend(apiRes, { data, msg, code, message: msg })
             
             if (code === successCode) {
               return Promise.resolve(apiRes)
@@ -68,6 +69,11 @@ function createAxiosService () {
   const handleAxiosInstances = function handleAxiosInstances (baseConfigs) {
     const defaultBaseCopy = extend({}, defaultBaseConfig)
     const { root, isCreateInstance } = extend(defaultBaseCopy, baseConfigs)
+    if (root === undefined) {
+      // eslint-disable-next-line no-console
+      console.error('请传入正确的请求根路径, 如: / 或 https://api.github.com')
+    }
+
     let axiosInstance
     let asyncAxiosInstance
     let _request
@@ -206,7 +212,7 @@ function createAxiosService () {
          */
         return (data, configs) => request({ url, method: POST, data, ...configs, ...moreConfigs })
       }),
-      postXForm: requestConnect(function axiosServicePostXForm (url, request, moreConfigs) {
+      postXFormData: requestConnect(function axiosServicePostXForm (url, request, moreConfigs) {
         return (data, configs = {}) => {
           return request({ 
             url, 
@@ -223,6 +229,21 @@ function createAxiosService () {
                   return formData
                 }, new FormData())
             }], 
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              ...configs.headers
+            },
+            ...configs,
+            ...moreConfigs
+          })
+        }
+      }),
+      postXFormString: requestConnect(function axiosServicePostXFormString (url, request, moreConfigs) {
+        return (data, configs = {}) => {
+          return request({ 
+            url, 
+            method: POST, 
+            data: qs.stringify(data),
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               ...configs.headers
@@ -280,6 +301,8 @@ function createAxiosService () {
     }
     
     requests.restFulDelete = requests.delete
+    // 兼容老版
+    requests.postXForm = requests.postXFormData
 
     return requests
   }

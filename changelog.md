@@ -1,3 +1,8 @@
+### 1.2.4
+*2019-05-28*
+- 在统一的response中添加多扩展一个message字段, 等价于msg字段, 受msgKey控制, 如[response keys](./src/create.js#L54)
+- 在getRequestsByRoot所返回的request对象中, 添加`postXFormData`(通过FormData来转换data, 适用于上传文件, Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryxxx) 与 `postXFormString`(qs.stringify来转换data, Content-Type: application/x-www-form-urlencoded) 两个函数, 扩展了之前Requset Headers中Content-Type为的能力, 详细代码[postXFormData](./src/create.js#215) 和 [postXFormString](./src/create.js#241), 使用案例[apis配置](./examples/client/apis.js#L35)
+
 ### 1.2.3
 *2019-04-28*
 - 添加[service-decorators](./src/service-decorators.js), 包含mock装饰器和消息装饰器, 不管哪种装饰提供的都是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等

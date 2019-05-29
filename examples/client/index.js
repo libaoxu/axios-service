@@ -1,5 +1,5 @@
 import axiosService from 'axios-service'
-import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis } from './apis'
+import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader } from './apis'
 import jsonp from 'jsonp'
 import axios from 'axios'
 import { axiosServiceCreateGetInfo } from './axios-service-create';
@@ -49,6 +49,8 @@ const postInfoWithTicket = () => postInfo({ ticket: 'ticket' }, {
 }).then(({ data }) => data)
 
 const postXForm = _ => postXFormWithStaticHeader({ name: 'libaoxu' })
+const postXFormDataDemo = _ => postXFormDataWithStaticHeader({ name: 'libaoxu' })
+const postXFormStringDemo = _ => postXFormStringWithStaticHeader({ name: 'libaoxu' })
 
 // 第一个参数是urlData, 处理restFul url中的格式的
 // 第二个参数是具体的data
@@ -85,7 +87,15 @@ const requestChains = [
   {
     text: 'post请求在apis已经配置好固定的header',
     fn: postXForm
-  }, 
+  },
+  {
+    text: 'header中的Content-Type是application/x-www-form-urlencoded类型的post请求, data是FormData',
+    fn: postXFormDataDemo
+  },
+  {
+    text: 'header中的Content-Type是application/x-www-form-urlencoded类型的post请求, data是string',
+    fn: postXFormStringDemo
+  },
   {
     text: 'restFul配置案例',
     fn: restFulDemo
@@ -109,7 +119,7 @@ const requestChains = [
   {
     text: 'axiosService.create',
     fn: axiosServiceCreateGetInfo
-  }
+  },
 ]
 
 const rootEl = document.getElementById('root')
