@@ -234,7 +234,7 @@ export default new Apis()
 ### 消息装饰器
 > 消息装饰器是一个工具函数, 与axios-service没有关联, 可装饰任何返回Promise的函数, 该装饰器更多提供的只是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
 ```js
-import { getMesageDecorator } from 'axios-service'
+import { getMessageDecorator } from 'axios-service'
 // 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
 import { compose } from 'redux'
 // const { compose } = require('ramda')
@@ -250,7 +250,7 @@ const messageDecorator = getMessageDecorator({ success: alert, error: alert })
  * 单个装饰器
  */
 class Apis {
-  @messageDecorator({ sucessMsg: '获取用户信息请求成功', errorMsg: '获取用户信息请求失败' })
+  @messageDecorator({ successMsg: '获取用户信息请求成功', errorMsg: '获取用户信息请求失败' })
   getInfo: get('api/getInfo')
 }
 
@@ -258,7 +258,7 @@ class Apis {
  * 多个装饰器
  */
 class Apis {
-  @messageDecorator({ sucessMsg: '获取用户信息请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
+  @messageDecorator({ successMsg: '获取用户信息请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
   @mockSuccess
   getInfo: get('api/getInfo'),
 
@@ -266,7 +266,7 @@ class Apis {
    * 函数式写法
    */ 
   getInfoFunc: compose(
-    messageDecorator({ sucessMsg: '请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
+    messageDecorator({ successMsg: '请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
     mockSuccess
   )(get('api/getInfo'))
 }
@@ -288,6 +288,43 @@ api.getInfo().then(() => {
 // 该接口使用多次之后, 不需要每次都进行消息提示
 api.getInfo()
 ```
+
+### 创建新实例
+> 配合axios.create使用, 创建新的axiosService实例, 更多案例详情, 请查看使用案例[axios-service-create](./examples/client/axios-service-create.js)
+```js
+const instance = axios.create()
+const customService = axiosService.create(instance, {
+  defaults: {
+    withCredentials: true
+  },
+  requestDefaults: {
+    autoLoading: true,
+    // server端请求msg
+    msgKey: 'message',
+    // server端数据的key
+    dataKey: 'data',
+    // server端请求状态的key
+    codeKey: 'code',
+    // server端请求成功的状态
+    successCode: 1
+  }
+})
+
+instance.interceptors.request.use(function (e) {
+  console.log('axiosCreate 独立实例拦截器: ', e)
+  return e
+})
+
+
+const { getRequestsByRoot } = customService
+const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
+
+export const axiosServiceCreateGetInfo = get('api/getCode1Info', null, {
+  autoLoading: false
+})
+
+```
+
 
 ### 更多实际演示请查看代码
 [examples](./examples/client/index.js)

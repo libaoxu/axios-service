@@ -1,7 +1,14 @@
+### 1.2.5
+*2019-06-12*
+- 修改createAxiosService中 new Service 所传参数`requestOpts`的地址引用问题, 具体如: [new Service](./src/create.js#L15);
+- readme中添加[axiosService.create](./readme.md#L292)使用案例;
+- 修改readme中消息装饰器`getMessageDecorator`案例中单词拼写问题, 对应[issues/5](https://github.com/libaoxu/axios-service/issues/5);
+
+
 ### 1.2.4
 *2019-05-28*
 - 在接口请求的response中多扩展一个message字段, 等价于之前的`msg`字段, 受`msgKey`控制, 如[response keys](./src/create.js#L54)
-- 在getRequestsByRoot所返回的request对象中, 添加`postXFormData`(通过FormData来转换data, 适用于上传文件, Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryxxx) 与 `postXFormString`(qs.stringify来转换data, Content-Type: application/x-www-form-urlencoded) 两个函数, 扩展了之前Requset Headers中Content-Type为的能力, 详细代码[postXFormData](./src/create.js#215) 和 [postXFormString](./src/create.js#241), 使用案例[apis配置](./examples/client/apis.js#L35)
+- 在getRequestsByRoot所返回的requests对象中, 添加`postXFormData`(通过FormData来转换data, 适用于上传文件, Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryxxx) 与 `postXFormString`(qs.stringify来转换data, Content-Type: application/x-www-form-urlencoded) 两个函数, 扩展了之前Requset Headers中Content-Type为的能力, 详细代码[postXFormData](./src/create.js#L215) 和 [postXFormString](./src/create.js#L241), 使用案例[apis配置](./examples/client/apis.js#L35)
 
 ### 1.2.3
 *2019-04-28*
