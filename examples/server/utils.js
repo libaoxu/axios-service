@@ -1,9 +1,17 @@
+const SUCCESS_MSG = 'success'
+const SUCCESS_CODE = 0
 
 exports.sucessResponse = function (data) {
-  const SUCCESS_CODE = 0
-  const SUCCESS_MSG = 'success'
   return {
     code: SUCCESS_CODE,
+    message: SUCCESS_MSG,
+    data
+  }
+}
+
+exports.code1SuccessResponse = function (data) {
+  return {
+    code: 1,
     message: SUCCESS_MSG,
     data
   }

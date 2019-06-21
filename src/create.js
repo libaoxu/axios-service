@@ -10,11 +10,13 @@ import Service from './service'
 import qs from 'qs'
 
 
-function createAxiosService () {
+function createAxiosService (instance, options) {
   const service = new Service({
-    requestDefaults,
+    requestDefaults: { ...requestDefaults },
     createdRequestStack: [],
-    createdAxiosInstanceStack: []
+    createdAxiosInstanceStack: [],
+    instance,
+    ...options
   })
   
   /**
@@ -67,8 +69,7 @@ function createAxiosService () {
     }
   }
   const handleAxiosInstances = function handleAxiosInstances (baseConfigs) {
-    const defaultBaseCopy = extend({}, defaultBaseConfig)
-    const { root, isCreateInstance } = extend(defaultBaseCopy, baseConfigs)
+    const { root, isCreateInstance } = { ...defaultBaseConfig, ...baseConfigs }
     if (root === undefined) {
       // eslint-disable-next-line no-console
       console.error('请传入正确的请求根路径, 如: / 或 https://api.github.com')

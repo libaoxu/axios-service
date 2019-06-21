@@ -1,3 +1,10 @@
+### 1.2.5
+*2019-06-12*
+- 修改createAxiosService中 new Service 所传参数`requestOpts`的地址引用问题, 具体如: [new Service](./src/create.js#L15);
+- readme中添加[axiosService.create](./readme.md#L292)使用案例;
+- 修改readme中消息装饰器`getMessageDecorator`案例中单词拼写问题, 对应[issues/5](https://github.com/libaoxu/axios-service/issues/5);
+
+
 ### 1.2.4
 *2019-05-28*
 - 在接口请求的response中多扩展一个message字段, 等价于之前的`msg`字段, 受`msgKey`控制, 如[response keys](./src/create.js#L54)

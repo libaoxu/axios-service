@@ -139,12 +139,13 @@ var _qs2 = _interopRequireDefault(_qs);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function createAxiosService() {
-  var service = new _service2.default({
-    requestDefaults: _config.requestDefaults,
+function createAxiosService(instance, options) {
+  var service = new _service2.default(_extends({
+    requestDefaults: _extends({}, _config.requestDefaults),
     createdRequestStack: [],
-    createdAxiosInstanceStack: []
-  });
+    createdAxiosInstanceStack: [],
+    instance: instance
+  }, options));
 
   var responseDecorator = function responseDecorator(instance, requestOpts) {
     var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
@@ -186,11 +187,9 @@ function createAxiosService() {
     };
   };
   var handleAxiosInstances = function handleAxiosInstances(baseConfigs) {
-    var defaultBaseCopy = (0, _utils.extend)({}, _config.defaultBaseConfig);
-
-    var _extend = (0, _utils.extend)(defaultBaseCopy, baseConfigs),
-        root = _extend.root,
-        isCreateInstance = _extend.isCreateInstance;
+    var _defaultBaseConfig$ba = _extends({}, _config.defaultBaseConfig, baseConfigs),
+        root = _defaultBaseConfig$ba.root,
+        isCreateInstance = _defaultBaseConfig$ba.isCreateInstance;
 
     if (root === undefined) {
       console.error('请传入正确的请求根路径, 如: / 或 https://api.github.com');
@@ -214,20 +213,20 @@ function createAxiosService() {
     var getInstance = function getInstance() {
       if (service.$http) {
         clearTimeout(tid);
-        var instance = void 0;
+        var _instance = void 0;
 
         if (isCreateInstance) {
-          instance = service.$http.create(_extends({
+          _instance = service.$http.create(_extends({
             baseURL: root
           }, baseConfigs));
         } else {
-          instance = function instance(config) {
+          _instance = function _instance(config) {
             return service.$http(_extends({}, config, { url: (0, _utils.joinRootAndPath)(root, config.url) }));
           };
         }
-        instance.baseURL = root;
+        _instance.baseURL = root;
 
-        return instance;
+        return _instance;
       }
     };
 
@@ -648,8 +647,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _config = __webpack_require__(4);
 
-var _utils = __webpack_require__(3);
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Service = function () {
@@ -658,7 +655,7 @@ var Service = function () {
 
     _classCallCheck(this, Service);
 
-    this.$http = null;
+    this.$http = options.instance || null;
     this.requestDefaults = options.requestDefaults || {};
     this.createdRequestStack = options.createdRequestStack || [];
     this.createdAxiosInstanceStack = options.createdAxiosInstanceStack || [];
@@ -683,14 +680,14 @@ var Service = function () {
   }, {
     key: 'setDefaults',
     value: function setDefaults(newConfig) {
-      (0, _utils.extend)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
+      this.$http.defaults = _extends({}, _config.defaults, newConfig);
     }
   }, {
     key: 'setRequestDefaults',
     value: function setRequestDefaults() {
       var newRequestOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      (0, _utils.extend)(this.requestDefaults, newRequestOpts);
+      this.requestDefaults = _extends({}, newRequestOpts);
     }
   }, {
     key: '_executeRequestInstance',
@@ -698,7 +695,7 @@ var Service = function () {
       var _this = this;
 
       this.createdRequestStack.forEach(function (fn) {
-        return fn(_this.$http);
+        return fn && fn(_this.$http);
       });
     }
   }, {
@@ -707,7 +704,7 @@ var Service = function () {
       var _this2 = this;
 
       this.createdAxiosInstanceStack.forEach(function (fn) {
-        return fn(_this2.$http);
+        return fn && fn(_this2.$http);
       });
     }
   }]);
