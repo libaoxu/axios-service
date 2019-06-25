@@ -251,7 +251,7 @@ const messageDecorator = getMessageDecorator({ success: alert, error: alert })
  */
 class Apis {
   @messageDecorator({ successMsg: '获取用户信息请求成功', errorMsg: '获取用户信息请求失败' })
-  getInfo: get('api/getInfo')
+  getInfo = get('api/getInfo')
 }
 
 /**
@@ -260,12 +260,12 @@ class Apis {
 class Apis {
   @messageDecorator({ successMsg: '获取用户信息请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
   @mockSuccess
-  getInfo: get('api/getInfo'),
+  getInfo = get('api/getInfo')
 
   /**
    * 函数式写法
    */ 
-  getInfoFunc: compose(
+  getInfoFunc = compose(
     messageDecorator({ successMsg: '请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
     mockSuccess
   )(get('api/getInfo'))
