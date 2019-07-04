@@ -1,3 +1,8 @@
+### 1.2.6
+*2019-07-04*
+- 修改this.$https.defaults 修改axios.defaults内部地址引用问题, 导致axios内部config值设置失效, 非常严重的bug, 详见[this.setDefaults](./src/service.js#L26)
+
+
 ### 1.2.5
 *2019-06-12*
 - 修改createAxiosService中 new Service 所传参数`requestOpts`的地址引用问题, 具体如: [new Service](./src/create.js#L15);

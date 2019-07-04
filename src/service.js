@@ -1,4 +1,5 @@
 import { defaults } from './config'
+import { extend } from './utils'
 
 export default class Service {
   constructor (options = {}) {
@@ -22,7 +23,8 @@ export default class Service {
   }
 
   setDefaults (newConfig) {
-    this.$http.defaults = { ...defaults, ...newConfig }
+    // 一定要保留this.$http.defaults旧地址引用不变
+    extend(this.$http.defaults, { ...defaults, ...newConfig })
   }
 
   setRequestDefaults (newRequestOpts = {}) {

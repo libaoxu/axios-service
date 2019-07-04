@@ -647,6 +647,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _config = __webpack_require__(4);
 
+var _utils = __webpack_require__(3);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Service = function () {
@@ -680,7 +682,7 @@ var Service = function () {
   }, {
     key: 'setDefaults',
     value: function setDefaults(newConfig) {
-      this.$http.defaults = _extends({}, _config.defaults, newConfig);
+      (0, _utils.extend)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
     }
   }, {
     key: 'setRequestDefaults',

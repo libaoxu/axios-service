@@ -19,6 +19,8 @@ const customService = axiosService.create(instance, {
   }
 })
 
+instance.defaults.withCredentials = true
+
 instance.interceptors.request.use(function (e) {
   console.log('axiosCreate 独立实例拦截器: ', e)
   return e
