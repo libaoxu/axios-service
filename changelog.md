@@ -1,3 +1,9 @@
+### 1.3.0
+*2019-08-04*
+- dist目录构建结果修改为: `axios-serivce.development.js` 和 `axios-serivce.production.min.js`, [webpack.prod.conf](./build/webpack.prod.conf.js#L6)
+- package.json中`main`字段指向index.js, index.js中根据环境区分判断指向`axios-serivce.development.js`or`axios-serivce.production.min.js`, [package.json](./package.json#L5), [index.js](./index.js)
+- service-decorators中暴露了[mockDecorator](./src/service-decorators.js#L47), 这样mock时候就不用传入process.env.NODE_ENV的判断了, 因为构建时候已经构建出两个 process.env.NODE_ENV 变量的js, 并在入口index.js判断开发模式和构建会引入不同的js, 已经保证了dev和prod双模式下的区分;
+
 ### 1.2.6
 *2019-07-04*
 - 修改this.$https.defaults 修改axios.defaults内部地址引用问题, 导致axios内部config值设置失效, 非常严重的bug, 详见[this.setDefaults](./src/service.js#L26)

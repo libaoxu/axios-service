@@ -45,6 +45,16 @@ export function getMockDecoratorByEnv (isDev) {
 }
 
 /**
+ * mock装饰器
+ * 
+ * 注: 因为最新版axios-service 会构建出两个 process.env.NODE_ENV 变量的js, 并在入口index.js判断, 开发模式和构建会引入不同的js, 这样能保证dev模式和prod模式的区分
+ * 
+ * @param {Function} mockFn mock的函数逻辑
+ * @return {Function}
+ */
+export const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
+
+/**
  * 消息提示装饰器, 依赖于外层toast对象, 提供toast.success 和 toast.error两个函数
  * @param {Object} toast 
  * @param {Function} toast.success

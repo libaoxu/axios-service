@@ -2,7 +2,7 @@
   "name": "axios-service",
   "version": "1.2.6",
   "description": "make axios more easlier to use in code",
-  "main": "dist/axios-service.js",
+  "main": "index.js",
   "directories": {
     "example": "examples",
     "test": "test"
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "example": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.example.conf.js --open",
-    "build:umd": "webpack --config build/webpack.prod.conf.js",
+    "build:umd": "cross-env NODE_ENV=development webpack --config build/webpack.prod.conf.js",
     "build:umd:min": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js",
     "build": "npm run lint && npm run build:umd && npm run build:umd:min",
     "pub": "npm run lint && sh build/release.sh",
