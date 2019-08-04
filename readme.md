@@ -195,7 +195,7 @@ const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'developmen
 const mockDecorator = getMockDecoratorByEnv(__DEV__)
 
 
-// 注意: 从1.3.0起, 直接暴露了mockDecorator函数, 不需要通过getMockDecoratorByEnv来创建
+// 注意: 从1.3.1起, 直接暴露了mockDecorator函数, 不需要通过getMockDecoratorByEnv来创建
 import { mockDecorator } from 'axios-service'
 
 
