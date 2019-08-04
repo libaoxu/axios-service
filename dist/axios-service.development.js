@@ -1290,7 +1290,7 @@ exports.default = createAxiosService;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
+exports.version = exports.mockDecorator = exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
 
 var _create = __webpack_require__(/*! ./create */ "./src/create.js");
 
@@ -1303,11 +1303,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
 
+var version = '1.3.1';
+
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
 exports.createAxiosService = _create2.default;
 exports.getMessageDecorator = _serviceDecorators.getMessageDecorator;
 exports.getMockDecoratorByEnv = _serviceDecorators.getMockDecoratorByEnv;
+exports.mockDecorator = _serviceDecorators.mockDecorator;
+exports.version = version;
+
+
+axiosService.version = version;
+
 exports.default = axiosService;
 
 /***/ }),

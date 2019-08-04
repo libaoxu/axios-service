@@ -1,7 +1,7 @@
 
-import { getMockDecoratorByEnv } from 'axios-service'
+import { getMockDecoratorByEnv, mockDecorator } from 'axios-service'
 
-const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
+// const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
 // const mockDecorator = getMockDecoratorByEnv(false)
 
 export const mockGetInfo = mockDecorator((...args) => {

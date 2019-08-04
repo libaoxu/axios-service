@@ -1,3 +1,8 @@
+### 1.3.1
+*2019-08-04*
+- 再axios-serivce中暴露mockDecorator函数, [src/index.js](./src/index.js#L20)
+- 再axios-serivce中增加当前系统的version变量, [src/index.js](./src/index.js#L12)
+
 ### 1.3.0
 *2019-08-04*
 - dist目录构建结果修改为: `axios-serivce.development.js` 和 `axios-serivce.production.min.js`, [webpack.prod.conf](./build/webpack.prod.conf.js#L6)

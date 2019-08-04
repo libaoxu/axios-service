@@ -22,7 +22,7 @@ module.exports = merge(baseConfig, {
   resolve: {
     alias: {
       'axios-service': path.resolve(__dirname, '../src/index.js'),
-      // 'axios-service': path.resolve(__dirname, '../dist/axios-service.js')
+      // 'axios-service': path.resolve(__dirname, '../'),
     }
   },
   devServer: {

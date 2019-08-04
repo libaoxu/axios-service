@@ -4,10 +4,12 @@
  * @date 2018-05-08
  */
 import createAxiosService from './create'
-import { getMessageDecorator, getMockDecoratorByEnv } from './service-decorators'
+import { getMessageDecorator, getMockDecoratorByEnv, mockDecorator } from './service-decorators'
 
 const axiosService = createAxiosService()
 const getRequestsByRoot = axiosService.getRequestsByRoot
+// 目前手动维护, 后面考虑如何扩展吧
+const version = '1.3.1'
 
 export {
   axiosService,
@@ -15,6 +17,10 @@ export {
   createAxiosService,
   getMessageDecorator,
   getMockDecoratorByEnv,
+  mockDecorator,
+  version
 }
+
+axiosService.version = version
 
 export default axiosService
