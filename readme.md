@@ -194,6 +194,11 @@ const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'developmen
 // react-native项目
 const mockDecorator = getMockDecoratorByEnv(__DEV__)
 
+
+// 注意: 从1.3.0起, 直接暴露了mockDecorator函数, 不需要通过getMockDecoratorByEnv来创建
+import { mockDecorator } from 'axios-service'
+
+
 // mock相关逻辑
 const mockGetInfo = mockDecorator((...args) => {
   // 这样可以在production构建阶段, 剔除掉if内部的mock代码, 减少线上包体积, 下面代码构建结果如下: if(false) { var mockjs; }
