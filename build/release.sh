@@ -19,7 +19,8 @@ then
   npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
   npm run build
   npm config set sign-git-tag false
-  np --no-cleanup --any-branch --yolo
+  npm publish
+  # np --no-cleanup --any-branch --yolo
 
   # commit
   git add -A
