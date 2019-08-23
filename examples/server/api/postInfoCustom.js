@@ -1,7 +1,7 @@
 const { sucessResponse } = require('../utils')
 
 var userInfo = {
-  type: 'get Info custom response',
+  type: 'post Info custom response',
   name: '李宝旭',
   name_en: 'libaoxu',
   email: 'libaoxu520@gmail.com',

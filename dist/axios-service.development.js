@@ -935,8 +935,6 @@ var defaultBaseConfig = exports.defaultBaseConfig = {
 };
 
 var requestDefaults = exports.requestDefaults = {
-  autoLoading: true,
-
   msgKey: 'error_msg',
 
   dataKey: 'data',
@@ -1290,7 +1288,7 @@ exports.default = createAxiosService;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.version = exports.mockDecorator = exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
+exports.version = exports.serviceHocs = exports.mockDecorator = exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
 
 var _create = __webpack_require__(/*! ./create */ "./src/create.js");
 
@@ -1298,22 +1296,36 @@ var _create2 = _interopRequireDefault(_create);
 
 var _serviceDecorators = __webpack_require__(/*! ./service-decorators */ "./src/service-decorators.js");
 
+var serviceHocs = _interopRequireWildcard(_serviceDecorators);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var getMessageDecorator = serviceHocs.getMessageDecorator,
+    getMockDecoratorByEnv = serviceHocs.getMockDecoratorByEnv,
+    mockDecorator = serviceHocs.mockDecorator;
+
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-
-var version = '1.3.1';
+var version = "1.3.1";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
 exports.createAxiosService = _create2.default;
-exports.getMessageDecorator = _serviceDecorators.getMessageDecorator;
-exports.getMockDecoratorByEnv = _serviceDecorators.getMockDecoratorByEnv;
-exports.mockDecorator = _serviceDecorators.mockDecorator;
+exports.getMessageDecorator = getMessageDecorator;
+exports.getMockDecoratorByEnv = getMockDecoratorByEnv;
+exports.mockDecorator = mockDecorator;
+exports.serviceHocs = serviceHocs;
 exports.version = version;
 
 
+axiosService.createAxiosService = _create2.default;
+axiosService.getMessageDecorator = getMessageDecorator;
+axiosService.getMockDecoratorByEnv = getMockDecoratorByEnv;
+axiosService.mockDecorator = mockDecorator;
+axiosService.serviceHocs = serviceHocs;
 axiosService.version = version;
 
 exports.default = axiosService;
@@ -1356,6 +1368,8 @@ var HEAD = exports.HEAD = 'head';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -1439,6 +1453,59 @@ var getMessageDecorator = exports.getMessageDecorator = function getMessageDecor
     };
   };
 };
+
+var getErrorMsg = exports.getErrorMsg = function getErrorMsg() {
+  var msg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  return function (error) {
+    return error && (error.msg || msg);
+  };
+};
+
+var requestOptsWrapper = exports.requestOptsWrapper = function requestOptsWrapper(requestPathWrapper, opts) {
+  return function (path) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    return requestPathWrapper.apply(undefined, [path, opts].concat(args));
+  };
+};
+
+var requestConnector = function requestConnector(fn) {
+  return function (requestPathWrapper) {
+    for (var _len2 = arguments.length, preArgs = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      preArgs[_key2 - 1] = arguments[_key2];
+    }
+
+    return function (path) {
+      for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        args[_key3 - 1] = arguments[_key3];
+      }
+
+      var request = requestPathWrapper.apply(undefined, [path].concat(args));
+      return fn.apply(undefined, [request].concat(preArgs));
+    };
+  };
+};
+
+var setCustomParamsWrapper = exports.setCustomParamsWrapper = requestConnector(function (request, customParams) {
+  return function (data) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    return request(data, _extends({}, config, {
+      params: _extends({}, config.params, customParams)
+    }));
+  };
+});
+
+var setCustomDataWrapper = exports.setCustomDataWrapper = requestConnector(function (request, customData) {
+  return function (data) {
+    for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+      args[_key4 - 1] = arguments[_key4];
+    }
+
+    return request.apply(undefined, [_extends({}, customData, data)].concat(args));
+  };
+});
 
 /***/ }),
 

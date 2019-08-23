@@ -4,12 +4,13 @@
  * @date 2018-05-08
  */
 import createAxiosService from './create'
-import { getMessageDecorator, getMockDecoratorByEnv, mockDecorator } from './service-decorators'
+import * as serviceHocs from './service-decorators'
+
+const { getMessageDecorator, getMockDecoratorByEnv, mockDecorator } = serviceHocs
 
 const axiosService = createAxiosService()
 const getRequestsByRoot = axiosService.getRequestsByRoot
-// 目前手动维护, 后面考虑如何扩展吧
-const version = '1.3.1'
+const version = __VERSION__
 
 export {
   axiosService,
@@ -18,9 +19,15 @@ export {
   getMessageDecorator,
   getMockDecoratorByEnv,
   mockDecorator,
+  serviceHocs,
   version
 }
 
+axiosService.createAxiosService = createAxiosService
+axiosService.getMessageDecorator = getMessageDecorator
+axiosService.getMockDecoratorByEnv = getMockDecoratorByEnv
+axiosService.mockDecorator = mockDecorator
+axiosService.serviceHocs = serviceHocs
 axiosService.version = version
 
 export default axiosService

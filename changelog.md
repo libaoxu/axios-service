@@ -1,3 +1,14 @@
+### 1.3.2
+*2019-08-23*
+### Added
+  * 在入口中添加`serviceHocs`, 如[serviceHocs](./src/index.js#L22)
+  * `service-decorators`中添加[getErrMsg](./src/service-decorators.js#L109); 使用案例请参考[service-hocs](./examples/client/service-hocs.js), [apis](./examples/client/apis.js#L64)
+  * `service-decorators`中添加[requestOptsWrapper](./src/service-decorators.js#L134), [setCustomDataWrapper](./src/service-decorators.js#L170), [setCustomParamsWrapper](./src/service-decorators.js#L197), 使用案例请参考: [api-request-custom](./examples/client/apis-request-custom.js)
+### Fixed
+  *
+### Changed
+  * version 从环境变量`__VERSION__`中自动获取, [webpack配置](./build/webpack.base.conf.js#L19)
+
 ### 1.3.1
 *2019-08-04*
 - 再axios-serivce中暴露mockDecorator函数, [src/index.js](./src/index.js#L20)

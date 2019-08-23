@@ -53,7 +53,7 @@ dirs = listDirs(__dirname);
 server = http.createServer(function (req, res) {
   var url = req.url;
   var origin = req.headers.origin
-
+  var { pathname } = new URL(req.headers.origin + req.url)
   var writeHead = res.writeHead.bind(res)
 
   res.writeHead = function (status, params) {
@@ -67,8 +67,8 @@ server = http.createServer(function (req, res) {
   }
 
 
-  if (fs.existsSync(path.join(__dirname, url + '.js'))) {
-    require(path.join(__dirname, url + '.js'))(req, res);
+  if (fs.existsSync(path.join(__dirname, pathname + '.js'))) {
+    require(path.join(__dirname, pathname + '.js'))(req, res);
   } else {
     send404(res);
   }

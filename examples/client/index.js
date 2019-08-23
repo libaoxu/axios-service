@@ -1,8 +1,9 @@
 import axiosService from 'axios-service'
-import { getInfo, getInfoCustom, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader } from './apis'
+import { getInfo, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader } from './apis'
 import jsonp from 'jsonp'
 import axios from 'axios'
 import { axiosServiceCreateGetInfo } from './axios-service-create';
+import { getInfoCustom, postInfoCustom, getInfoCustomComposedData, postInfoCustomComposedParamsAndData } from './apis-request-custom';
 
 // todo 全局的loading队列
 axios.interceptors.request.use(function (e) {
@@ -31,14 +32,13 @@ axiosService.init(axios, {
 })
 
 console.log('axios.defaults: ', axios.defaults)
+console.log('axiosService version: ', axiosService.version)
 
 const returnData = res => res.data
 
 // 普通get请求
 // 这里就不需要判断服务端返回的状态码了, 因为已经配置过了
 const normalGetInfo = _ => getInfo()
-
-const getInfoWithCustomResKeys = () => getInfoCustom()
 
 // 普通postInfo请求
 const postInfoWithTicket = () => postInfo({ ticket: 'ticket' }, {
@@ -75,11 +75,7 @@ const requestChains = [
   {
     text: '普通get请求',
     fn: normalGetInfo
-  }, 
-  {
-    text: '自定义msgKey和codeKey的请求',
-    fn: getInfoWithCustomResKeys
-  }, 
+  },
   {
     text: 'post请求在headers上添加ticket',
     fn: postInfoWithTicket,
@@ -120,6 +116,22 @@ const requestChains = [
     text: 'axiosService.create',
     fn: axiosServiceCreateGetInfo
   },
+  {
+    text: '自定义msgKey和codeKey的 get 请求 ',
+    fn: getInfoCustom
+  }, 
+  {
+    text: '自定义msgKey和codeKey的 post 请求 ',
+    fn: postInfoCustom
+  },
+  {
+    text: 'compose 自定义requestOpts 和 customData 的 get 请求 ',
+    fn: getInfoCustomComposedData
+  }, 
+  {
+    text: 'compose 自定义requestOpts 和 customParams 和 customData 的 post 请求 ',
+    fn: postInfoCustomComposedParamsAndData
+  }, 
 ]
 
 const rootEl = document.getElementById('root')

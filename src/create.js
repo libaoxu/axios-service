@@ -153,7 +153,14 @@ function createAxiosService (instance, options) {
     // 第一步 获取通过init来注入的axios实例
     const { getAxiosInstance, getAsyncAxiosInstance } = handleAxiosInstances(baseConfigs)
     
-    // 第二步 根据每个不同请求配置的requestOpts获取具体request请求的包装器
+    /**
+     * 第二步 根据每个不同请求配置的requestOpts获取具体request请求的包装器
+     * @param {Object} requestOpts 请求配置项对象
+     * @property {String} opts.msgKey server端请求msg
+     * @property {String} opts.dataKey server端数据的key
+     * @property {String} opts.codeKey server端请求状态的key
+     * @property {Number} opts.successCode server端请求成功的状态, 注意: 是服务端返回的状态码, 不是xhr在浏览器端的返回状态
+     */
     const getRequest = function getRequest (requestOpts) {
       let _request
       const axiosInstance = getAxiosInstance()

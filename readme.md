@@ -234,17 +234,19 @@ export default new Apis()
 ### 消息装饰器
 > 消息装饰器是一个工具函数, 与axios-service没有关联, 可装饰任何返回Promise的函数, 该装饰器更多提供的只是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
 ```js
-import { getMessageDecorator } from 'axios-service'
+import { getMessageDecorator, serviceHocs } from 'axios-service'
 // 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
 import { compose } from 'redux'
 // const { compose } = require('ramda')
 
+const { getErrorMsg } = serviceHocs
 const { get, post, , postXFormData, postXFormString } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
 /**
  * 实际项目中应该替换 success 和 erorr 对应的ui函数
  */ 
 const messageDecorator = getMessageDecorator({ success: alert, error: alert })
+const requestFailMsg = getErrorMsg('请求失败, 请重试!')
 
 /**
  * 单个装饰器
@@ -266,7 +268,7 @@ class Apis {
    * 函数式写法
    */ 
   getInfoFunc = compose(
-    messageDecorator({ successMsg: '请求成功', errorMsg: (error) => (error && error.msg) || '请求失败' })
+    messageDecorator({ successMsg: '请求成功', errorMsg: requestFailMsg })
     mockSuccess
   )(get('api/getInfo'))
 }
@@ -288,6 +290,58 @@ api.getInfo().then(() => {
 // 该接口使用多次之后, 不需要每次都进行消息提示
 api.getInfo()
 ```
+### 其他高阶函数
+> requestOptsWrapper, setCustomParamsWrapper, setCustomDataWrapper
+```js
+import { serviceHocs, getRequestsByRoot } from 'axios-service'
+import { compose } from 'redux'
+
+const { requestOptsWrapper, setCustomDataWrapper, setCustomParamsWrapper } = serviceHocs
+const { get: baseGet, post: basePost, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
+
+const requestOpts = {
+  msgKey: 'error_msg',
+  codeKey: 'dm_error',
+  successCode: 0
+}
+
+const customData = { name: 'libx', birth: '1996' }
+
+const customParams = { uid: 123, sid: 456 }
+
+const get = requestOptsWrapper(baseGet, requestOpts)
+
+const post = requestOptsWrapper(basePost, requestOpts)
+
+const composeGet = compose(
+  fn => setCustomDataWrapper(fn, customData),
+  fn => requestOptsWrapper(fn, requestOpts),
+)(baseGet)
+  
+const composePost = compose(
+  fn => setCustomDataWrapper(fn, customData),
+  fn => requestOptsWrapper(fn, requestOpts),
+  fn => setCustomParamsWrapper(fn, customParams),
+)(post)
+
+export const getInfoCustom = get('/api/getInfoCustom')
+
+export const postInfoCustom = post('/api/postInfoCustom')
+
+/**
+ * 混合 setCustomDataWrapper 和 requestOptsWrapper 两种预置
+ */
+export const getInfoCustomComposedData = composeGet('/api/getInfoCustom')
+
+/**
+ * 混合 requestOptsWrapper 和 setCustomParamsWrapper 两种预置
+ */
+export const postInfoCustomComposedParamsAndData = composePost('/api/postInfoCustom')
+
+```
+更多详细使用请参考: [api-request-custom](./examples/client/apis-request-custom.js)
+
+
 
 ### 创建新实例
 > 配合axios.create使用, 创建新的axiosService实例, 更多案例详情, 请查看使用案例[axios-service-create](./examples/client/axios-service-create.js)

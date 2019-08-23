@@ -11,8 +11,6 @@ export const defaultBaseConfig = {
 }
 
 export const requestDefaults = {
-  // todo
-  autoLoading: true,
   // server端请求msg
   msgKey: 'error_msg',
   // server端数据的key
