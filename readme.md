@@ -286,7 +286,7 @@ class Apis {
 api.getInfo().then(() => {
   toast.success('请求成功')
 }, () => {
-  toast.error('请求失败)  
+  toast.error('请求失败')  
 })
 ```
 
