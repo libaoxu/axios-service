@@ -1309,7 +1309,7 @@ var getMessageDecorator = serviceHocs.getMessageDecorator,
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.3.2";
+var version = "1.3.3";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
