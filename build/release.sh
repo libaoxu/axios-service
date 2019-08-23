@@ -15,16 +15,16 @@ then
 
   # build
   VERSION=$VERSION 
+  # 设置sign-git-tag 为false, 否则会报gpg failed to sign the data
+  npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
   npm run build
+  npm config set sign-git-tag false
+  np --no-cleanup --any-branch --yolo
 
   # commit
   git add -A
   git commit -m "[build] $VERSION"
 
-  # 设置sign-git-tag 为false, 否则会报gpg failed to sign the data
-  npm config set sign-git-tag false
-  np --no-cleanup --any-branch --yolo 
-  # npm version $VERSION --message "[build: release] $VERSION" --allow-same-version
   # npm publish
 
   # publish
