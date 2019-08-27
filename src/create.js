@@ -211,7 +211,17 @@ function createAxiosService (instance, options) {
          * @param {Object} config 请求接口的配置项, 详见https://github.com/axios/axios#request-config
          * 注意: get请求, 第一个参数传params, 
          */
-        return (params, configs) => request({ url, method: GET, params, ...configs, ...moreConfigs })
+        return (params, configs = {}) => request({ 
+          url, 
+          method: GET, 
+          ...configs, 
+          ...moreConfigs,
+          // 保证params优先级最高, 加油💪
+          params: {
+            ...params,
+            ...configs.params,
+          }, 
+        })
       }),
       post: requestConnect(function axiosServicePost (url, request, moreConfigs) {
         /**

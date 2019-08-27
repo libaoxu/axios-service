@@ -1,3 +1,10 @@
+### 1.3.4
+*2019-08-27*
+### Fixed
+  * 修复`setCustomParamsWrapper`对get请求的params设置, 详见: [axiosServiceGet](./src/create.js#L203)
+### Added
+  * 案例中增加自定义更多参数传递
+
 ### 1.3.3
 *2019-08-23*
 ### Fixed

@@ -19,7 +19,7 @@ const get = requestOptsWrapper(baseGet, requestOpts)
 const post = requestOptsWrapper(basePost, requestOpts)
 
 const composeGet = compose(
-  fn => setCustomDataWrapper(fn, customData),
+  fn => setCustomParamsWrapper(fn, customData),
   fn => requestOptsWrapper(fn, requestOpts),
 )(baseGet)
   

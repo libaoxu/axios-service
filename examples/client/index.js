@@ -118,7 +118,7 @@ const requestChains = [
   },
   {
     text: '自定义msgKey和codeKey的 get 请求 ',
-    fn: getInfoCustom
+    fn: () => getInfoCustom({ start: 1111 })
   }, 
   {
     text: '自定义msgKey和codeKey的 post 请求 ',
@@ -126,11 +126,15 @@ const requestChains = [
   },
   {
     text: 'compose 自定义requestOpts 和 customData 的 get 请求 ',
-    fn: getInfoCustomComposedData
+    fn: () => getInfoCustomComposedData({ key1: '111', key2: '222' })
   }, 
   {
     text: 'compose 自定义requestOpts 和 customParams 和 customData 的 post 请求 ',
-    fn: postInfoCustomComposedParamsAndData
+    fn: () => postInfoCustomComposedParamsAndData({ key1: 'aaa', key2: 'bbb' }, {
+      headers: {
+        'ticket': 'mo tian lun'
+      }
+    })
   }, 
 ]
 
