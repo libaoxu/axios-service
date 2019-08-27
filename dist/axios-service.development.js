@@ -1150,8 +1150,14 @@ function createAxiosService(instance, options) {
       getAsyncAxiosInstance: getAsyncAxiosInstance,
 
       get: requestConnect(function axiosServiceGet(url, request, moreConfigs) {
-        return function (params, configs) {
-          return request(_extends({ url: url, method: _requestTypes.GET, params: params }, configs, moreConfigs));
+        return function (params) {
+          var configs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          return request(_extends({
+            url: url,
+            method: _requestTypes.GET
+          }, configs, moreConfigs, {
+            params: _extends({}, params, configs.params)
+          }));
         };
       }),
       post: requestConnect(function axiosServicePost(url, request, moreConfigs) {
@@ -1309,7 +1315,7 @@ var getMessageDecorator = serviceHocs.getMessageDecorator,
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.3.3";
+var version = "1.3.4";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
