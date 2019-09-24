@@ -318,16 +318,21 @@ const get = requestOptsWrapper(baseGet, requestOpts)
 
 const post = requestOptsWrapper(basePost, requestOpts)
 
+// basic
 const composeGet = compose(
   fn => setCustomDataWrapper(fn, customData),
   fn => requestOptsWrapper(fn, requestOpts),
 )(baseGet)
-  
-const composePost = compose(
+
+// or
+const requestHoc = compose(
   fn => setCustomDataWrapper(fn, customData),
   fn => requestOptsWrapper(fn, requestOpts),
   fn => setCustomParamsWrapper(fn, customParams),
-)(post)
+)
+
+const composePost = requestHoc(post)
+const composeGet = requestHoc(get)
 
 export const getInfoCustom = get('/api/getInfoCustom')
 
