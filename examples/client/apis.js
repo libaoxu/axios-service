@@ -1,4 +1,4 @@
-import { getRequestsByRoot, serviceHocs } from 'axios-service'
+import { getRequestsByRoot, serviceHocs, version } from 'axios-service'
 import { compose } from 'redux'
 import { mockGetInfo, mockSuccess, mockFail } from './apis-mock'
 import { messageDecorator, requestFailErrMsg } from './service-hocs';
@@ -11,6 +11,9 @@ import { messageDecorator, requestFailErrMsg } from './service-hocs';
 // 注意: 这里的root是写死的demo, 实际项目可能应该根据具体环境不同, 请求不同url做不同处理
 const { get, post, postXForm, postXFormData, postXFormString } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 const { get: gitHubGet, restFulGet: gitHubRestFulGet } = getRequestsByRoot({ root: 'https://api.github.com', isCreateInstance: true })
+
+// dataKey为null时, 会直接将http请求中的data字段返回
+export const getInfoNoDataKey = get('api/getInfoResponseString', { dataKey: null })
 
 export const getInfo = get('api/getInfo', null, {
   autoLoading: false

@@ -11,27 +11,30 @@ npm install axios-service -D
 ### 全局配置
 > 注意: 全局设置为全局通用的配置, 需要再入口处设置, 下面配置项也可以针对某个请求单独设置
 
+配置参数说明
+
 ```js
 import axios from 'axios'
 import axiosService from 'axios-service'
 
+// 配置示例
 axiosService.init(axios, {
-  // 基础设置
+  // `defaults` 是基础设置, 是透传到axios.defaults的配置
   defaults: {
+    // `withCredentials` 跨域配置
     withCredentials: true
+    // ...
   },
-  // 请求配置项设置
+  // `requestDefaults` 是axiosService的请求配置项
   requestDefaults: {
-    // 目前还没实现, 预计在下个版本中处理
-    autoLoading: true,
-    // response.data下面的配置
-    // server端请求msg(
-    msgKey: 'msg',
-    // server端数据的key
+    // `dataKey` server端返回值数据的key
+    // 如果这个dataKey不存在, 会将http请求返回的data字段直接返回(不是服务端的data)
     dataKey: 'data',
-    // server端请求状态的key
+    // `msgKey` server端返回值消息的key
+    msgKey: 'msg',
+    // `codeKey` server端返回值状态码的key
     codeKey: 'code',
-    // server端请求成功的状态, 注意: 此为response.data下该接口请求成功状态码, 非浏览器中http请求返回的成功状态(200)
+    // `successCode` server端请求成功的状态, 注意: 此为response.data下该接口请求成功状态码, 非浏览器中http请求返回的成功状态(200)
     successCode: 0
   }
 })
@@ -74,6 +77,9 @@ export const getPeInfo = peGet('api/v2/user/login', {
   codeKey: 'status',
 })
 
+// dataKey为null时, 会直接将http请求中的data字段返回
+export const getInfoNoDataKey = get('api/getInfoResponseString', { dataKey: null })
+
 // 自定义config,
 export const getPeInfo = peGet('api/v2/user/login', {
   msgKey: 'msg',
@@ -89,20 +95,20 @@ export const postPeInfo = (params, data) => post('api/v2/user/login', null, {
   params,
   data
 })()
- 
+
 export const postXFormData = (params, data) => postXFormData('api/v2/user/login', null, {
   params,
   data
 })()
- 
- 
+
+
 export const postXFormString = (params, data) => postXFormString('api/v2/user/login', null, {
   params,
   data,
   // 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
   autoLoading: false
 })()
- 
+
 
 // 扩展函数Promise, 适合异步获取请求参数
 const peUserLoginPost = pePost('api/v2/user/login')
@@ -131,7 +137,7 @@ getInfo({
     ticket: 'ticket',
   }
 })
-  // 第一个then是成功的回调, 是通过successCode和codeKey一起判断, 
+  // 第一个then是成功的回调, 是通过successCode和codeKey一起判断,
   .then(({ data, code, msg }) => {
     // 这里的 data, code, msg这三个字段, 就是配置时候传入的dataKey, codeKey, msgKey
     console.log(code, msg, data)
@@ -184,7 +190,7 @@ getHost({
 
 > 本库提供两个方案, 一个是函数包裹, 一个是类的装饰器方案. 如果用类的方案,需要添加class的decorators解析器[babel-plugin-transform-decorators](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy#readme)
 
-使用案例: 
+使用案例:
 ```js
 import { getMockDecoratorByEnv } from 'axios-service'
 
@@ -249,7 +255,7 @@ const { get, post, , postXFormData, postXFormString } = getRequestsByRoot({ root
 
 /**
  * 实际项目中应该替换 success 和 erorr 对应的ui函数
- */ 
+ */
 const messageDecorator = getMessageDecorator({ success: alert, error: alert })
 const requestFailMsg = getErrorMsg('请求失败, 请重试!')
 
@@ -271,14 +277,14 @@ class Apis {
 
   /**
    * 函数式写法
-   */ 
+   */
   getInfoFunc = compose(
     messageDecorator({ successMsg: '请求成功', errorMsg: requestFailMsg })
     mockSuccess
   )(get('api/getInfo'))
 }
 
-``` 
+```
 
 未使用消息装饰器接口的写法
 ```js
@@ -286,7 +292,7 @@ class Apis {
 api.getInfo().then(() => {
   toast.success('请求成功')
 }, () => {
-  toast.error('请求失败')  
+  toast.error('请求失败')
 })
 ```
 
@@ -420,11 +426,11 @@ npm run pub
 3. **src**： 具体逻辑放到src(source)下面
 4. **build**： 是构建和发布相关
 5. **dist**： 是构建之后的目录, 支持dev和prod双模式
-6. **package.json** 
+6. **package.json**
 - scripts: 抽象不同功能， 一定要自动化
 - main: 指定node_modules中依赖的入口文件
 
-7. **eslint**: 业务代码要有规范, 通用项目更要有代码规范, 
+7. **eslint**: 业务代码要有规范, 通用项目更要有代码规范,
 8. **changelog**: 每次项目迭代所做的修改一定做好记录
 9. test： 通用的组件肯定是业务无关的, 最好要有单元测试
 10. travis：持续集成

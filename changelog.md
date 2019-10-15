@@ -1,3 +1,10 @@
+### 1.3.5
+*2019-10-14*
+### Added
+  * readme中增加关于`dataKey`为不存在的配置说明
+  * example的server中增加`getInfoResponseString`接口, 不返回Json数据, 仅返回一个字符串
+
+
 ### 1.3.4
 *2019-08-27*
 ### Fixed
@@ -98,7 +105,7 @@
 - 内部逻辑大改造, 取消每次get|post创建过多无用的axios实例, 改为getRequestsByRoot创建一个axios实例
 - 取消axios.create来创建实例, 只将root作为闭包变量, 这样保证每次getRequestByRoot请求接口独立, 每次用的其实都是全局axios
 - 丰富example, 增加模拟接口的服务, 浏览器端增加视图, 启动命令详见[启动示例](readme.md#启动示例)
-- 删除res中的__response__变量, 避免循环引用(Converting circular structure), 而且也没啥用 
+- 删除res中的__response__变量, 避免循环引用(Converting circular structure), 而且也没啥用
 
 ### 1.0.7
 

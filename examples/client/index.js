@@ -1,5 +1,5 @@
 import axiosService from 'axios-service'
-import { getInfo, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader } from './apis'
+import { getInfo, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader, getInfoNoDataKey } from './apis'
 import jsonp from 'jsonp'
 import axios from 'axios'
 import { axiosServiceCreateGetInfo } from './axios-service-create';
@@ -77,9 +77,13 @@ const requestChains = [
     fn: normalGetInfo
   },
   {
+    text: '普通get请求 dataKey为null',
+    fn: getInfoNoDataKey
+  },
+  {
     text: 'post请求在headers上添加ticket',
     fn: postInfoWithTicket,
-  }, 
+  },
   {
     text: 'post请求在apis已经配置好固定的header',
     fn: postXForm
@@ -119,7 +123,7 @@ const requestChains = [
   {
     text: '自定义msgKey和codeKey的 get 请求 ',
     fn: () => getInfoCustom({ start: 1111 })
-  }, 
+  },
   {
     text: '自定义msgKey和codeKey的 post 请求 ',
     fn: postInfoCustom
@@ -127,7 +131,7 @@ const requestChains = [
   {
     text: 'compose 自定义requestOpts 和 customData 的 get 请求 ',
     fn: () => getInfoCustomComposedData({ key1: '111', key2: '222' })
-  }, 
+  },
   {
     text: 'compose 自定义requestOpts 和 customParams 和 customData 的 post 请求 ',
     fn: () => postInfoCustomComposedParamsAndData({ key1: 'aaa', key2: 'bbb' }, {
@@ -135,7 +139,7 @@ const requestChains = [
         'ticket': 'mo tian lun'
       }
     })
-  }, 
+  },
 ]
 
 const rootEl = document.getElementById('root')
@@ -145,7 +149,7 @@ const renderHtml = function () {
   </div>`).join('')
 
   rootEl.innerHTML = `
-    <div id="butons">${lists}</div> 
+    <div id="butons">${lists}</div>
     <br/>
     获取数据详情: <br/>
     <div id="resultInfo"></div>
@@ -168,6 +172,7 @@ const bindEvents = function () {
         resultInfoElem.innerHTML = `<pre style="color: limegreen;">${JSON.stringify(data, null, 2)}</pre>`
       }, error => {
         if (error) {
+          console.error(error);
           resultInfoElem.innerHTML = `<pre style="color: red;">${JSON.stringify(error, null, 2)}</pre>`
         }
       })
