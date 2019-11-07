@@ -995,32 +995,37 @@ function createAxiosService(instance, options) {
 
     return function request(config) {
       var requestInfo = ['url: ' + instance.baseURL + config.url, ', params:', config.params, ', data:', config.data];
-
       return instance(config).then(function (response) {
-        var status = response.status,
-            apiRes = response.data,
-            config = response.config;
+        if (!response) {
+          _utils.logger.error('http\u8BF7\u6C42\u5931\u8D25: \u5931\u8D25\u539F\u56E0\u8BF7\u68C0\u67E5\'axios.interceptors.request.use\'\u4E2D\u7B2C\u4E8C\u4E2A\u51FD\u6570\u8FD4\u56DE\u503C\u662F\u5426\u4E3A\'Promise.reject\'');
+          return Promise.reject(new Error('http请求失败'));
+        }
 
+        if (!(0, _utils.isObject)(response.data)) {
+          return Promise.resolve(response);
+        }
 
-        if (status === _config.STATUS_200) {
-          if (!dataKey) {
-            return Promise.resolve(apiRes);
-          }
-          var data = apiRes[dataKey];
-          var msg = apiRes[msgKey];
-          var code = apiRes[codeKey];
+        var responseData = _extends({}, response.data);
+        responseData.response = response;
 
-          (0, _utils.extend)(apiRes, { data: data, msg: msg, code: code, message: msg });
+        if (!dataKey) {
+          return Promise.resolve(responseData);
+        }
 
-          if (code === successCode) {
-            return Promise.resolve(apiRes);
-          } else {
-            _utils.logger.error.apply(_utils.logger, ['\u8BF7\u6C42\u9519\u8BEF: msg: ' + msg + ', code: ' + code + ' '].concat(requestInfo));
-            return Promise.reject(apiRes);
-          }
+        var data = responseData[dataKey];
+        var msg = responseData[msgKey];
+        var code = responseData[codeKey];
+
+        (0, _utils.extend)(responseData, { data: data, msg: msg, code: code, message: msg });
+
+        if (code === successCode) {
+          return Promise.resolve(responseData);
+        } else {
+          _utils.logger.error.apply(_utils.logger, ['codeKey: [' + codeKey + '] \u4E0D\u5339\u914D: ', 'msg: ' + msg + ', code: ' + code + ' '].concat(requestInfo, ['response: ', response]));
+          return Promise.reject(responseData);
         }
       }, function (e) {
-        _utils.logger.error.apply(_utils.logger, ['\u8BF7\u6C42\u5931\u8D25: '].concat(requestInfo));
+        _utils.logger.error.apply(_utils.logger, ['\u8BF7\u6C42\u5931\u8D25: '].concat(requestInfo, ['; error : ', e]));
         return Promise.reject(e);
       });
     };
@@ -1172,20 +1177,10 @@ function createAxiosService(instance, options) {
           return request(_extends({
             url: url,
             method: _requestTypes.POST,
-            data: data,
-            transformRequest: [function () {
-              var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-              var headers = arguments[1];
-
-
-              return Object.keys(data).reduce(function (formData, key) {
-                formData.append(key, data[key]);
-                return formData;
-              }, new FormData());
-            }],
-            headers: _extends({
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }, configs.headers)
+            data: Object.keys(data || {}).reduce(function (formData, key) {
+              formData.append(key, data[key]);
+              return formData;
+            }, new FormData())
           }, configs, moreConfigs));
         };
       }),
@@ -1196,10 +1191,7 @@ function createAxiosService(instance, options) {
           return request(_extends({
             url: url,
             method: _requestTypes.POST,
-            data: _qs2.default.stringify(data),
-            headers: _extends({
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }, configs.headers)
+            data: _qs2.default.stringify(data)
           }, configs, moreConfigs));
         };
       }),
@@ -1315,7 +1307,7 @@ var getMessageDecorator = serviceHocs.getMessageDecorator,
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.3.5";
+var version = "1.3.6";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
@@ -1650,7 +1642,10 @@ var joinRootAndPath = exports.joinRootAndPath = function joinRootAndPath(root, p
   return slashEndReplace(root) + '/' + slashStartReplace(path);
 };
 
-var _toString = Object.prototype.toString;
+var combineURLs = exports.combineURLs = joinRootAndPath;
+
+var toString = exports.toString = Object.prototype.toString;
+var hasOwnProperty = exports.hasOwnProperty = Object.prototype.hasOwnProperty;
 
 var isArray = exports.isArray = function isArray(val) {
   return toString.call(val) === '[object Array]';
@@ -1687,7 +1682,7 @@ function forEach(obj, fn) {
     }
   } else {
     for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (hasOwnProperty.call(obj, key)) {
         fn(obj[key], key, obj);
       }
     }
@@ -1745,14 +1740,23 @@ var logger = exports.logger = {
 
     (_console = console).log.apply(_console, ['[axios-service]'].concat(args));
   },
-  error: function error() {
+  warn: function warn() {
     var _console2;
 
     for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       args[_key2] = arguments[_key2];
     }
 
-    (_console2 = console).error.apply(_console2, ['[axios-service]'].concat(args));
+    (_console2 = console).warn.apply(_console2, ['[axios-service]'].concat(args));
+  },
+  error: function error() {
+    var _console3;
+
+    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args[_key3] = arguments[_key3];
+    }
+
+    (_console3 = console).error.apply(_console3, ['[axios-service]'].concat(args));
   }
 };
 
