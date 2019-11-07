@@ -21,7 +21,7 @@ import axiosService from 'axios-service'
 axiosService.init(axios, {
   // `defaults` 是基础设置, 是透传到axios.defaults的配置
   defaults: {
-    // `withCredentials` 跨域配置
+    // `withCredentials` 跨域允许携带cookie
     withCredentials: true
     // ...
   },
