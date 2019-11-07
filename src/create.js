@@ -4,7 +4,7 @@
  * @date 2018-05-08
  */
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
-import { formatRestFulUrl, extend, joinRootAndPath, logger } from './utils'
+import { formatRestFulUrl, extend, joinRootAndPath, logger, isObject } from './utils'
 import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION, defaultBaseConfig } from './config'
 import Service from './service'
 import qs from 'qs'
@@ -18,7 +18,7 @@ function createAxiosService (instance, options) {
     instance,
     ...options
   })
-  
+
   /**
    * axios实例的装饰器, 主要做响应拦截
    * @param {Axios} instance axios实例
@@ -32,38 +32,49 @@ function createAxiosService (instance, options) {
 
     /**
      * 在请求开始和请求结束的, 把状态的判断等重复case做处理
-     * 
+     *
      * @param {any} config 请求的config
      * @returns {Promise} 请求结果
      * todo loading
      */
     return function request (config) {
       const requestInfo = [`url: ${instance.baseURL}${config.url}`, ', params:', config.params, ', data:', config.data]
-
       return instance(config)
         .then(response => {
-          const { status, data: apiRes, config } = response
+          if (!response) {
+            logger.error(`http请求失败: 失败原因请检查'axios.interceptors.request.use'中第二个函数返回值是否为'Promise.reject'`)
+            return Promise.reject(new Error('http请求失败'))
+          }
 
-          if (status === STATUS_200) {
-            // 如果不存在dataKey, 则不处理data相关的值, 仅将data返回回去
-            if (!dataKey) {
-              return Promise.resolve(apiRes)
-            }
-            const data = apiRes[dataKey]
-            const msg = apiRes[msgKey]
-            const code = apiRes[codeKey]
+          // 返回的data不是object场景
+          if (!isObject(response.data)) {
+            return Promise.resolve(response)
+          }
 
-            extend(apiRes, { data, msg, code, message: msg })
-            
-            if (code === successCode) {
-              return Promise.resolve(apiRes)
-            } else {
-              logger.error(`请求错误: msg: ${msg}, code: ${code} `, ...requestInfo)
-              return Promise.reject(apiRes)
-            }
+          const responseData = { ...response.data }
+          responseData.response = response
+
+          // 如果不存在dataKey, 则不处理data相关的值, 仅将data返回回去
+          if (!dataKey) {
+            return Promise.resolve(responseData)
+          }
+
+          // 进入到第一个then里的已经是200 ~ 300区间的http status了, 所以不需要再判断status字段是否200了, 详见: https://github.com/axios/axios/blob/master/lib/core/settle.js#L13
+          const data = responseData[dataKey]
+          const msg = responseData[msgKey]
+          const code = responseData[codeKey]
+
+          // 将更多的信息返回给客户端, 避免地址引用引起JSON.stringify报错, 采用挨个变量解构
+          extend(responseData, { data, msg, code, message: msg })
+
+          if (code === successCode) {
+            return Promise.resolve(responseData)
+          } else {
+            logger.error(`codeKey: [${codeKey}] 不匹配: `, `msg: ${msg}, code: ${code} `, ...requestInfo, 'response: ', response)
+            return Promise.reject(responseData)
           }
         }, (e) => {
-          logger.error(`请求失败: `, ...requestInfo)
+          logger.error(`请求失败: `, ...requestInfo, '; error : ', e)
           return Promise.reject(e)
         })
     }
@@ -83,13 +94,13 @@ function createAxiosService (instance, options) {
     let $httpReady = new Promise((resolve, reject) => {
       $httpResolve = resolve
     })
-    
+
     let tid = setTimeout(() => {
       if (!axiosInstance) {
         logger.error('请注入axios实例, 如: axiosService.init(axios, config)')
       }
     }, timeout)
-    
+
     const getInstance = function getInstance () {
       if (service.$http) {
         clearTimeout(tid)
@@ -136,23 +147,23 @@ function createAxiosService (instance, options) {
 
   const jsonWrapperRequest = function jsonWrapperRequest (baseConfigs) {
     return function getRequest (config) {
-      
+
     }
   }
 
   /**
    * 根据根路径获取请求函数
-   * 
-   * @param {any} baseConfigs axios的基础配置, 
+   *
+   * @param {any} baseConfigs axios的基础配置,
    * @property {String} baseConfigs.root 根路劲
    * @property {Boolean} baseConfigs.isCreateInstance 是否创建新实例, 即: axios.create
-   * 
+   *
    * @returns {Object} requests axios请求集合
    */
   const getRequestsByRoot = function getRequestsByRoot (baseConfigs = {}) {
     // 第一步 获取通过init来注入的axios实例
     const { getAxiosInstance, getAsyncAxiosInstance } = handleAxiosInstances(baseConfigs)
-    
+
     /**
      * 第二步 根据每个不同请求配置的requestOpts获取具体request请求的包装器
      * @param {Object} requestOpts 请求配置项对象
@@ -185,8 +196,8 @@ function createAxiosService (instance, options) {
 
     // 具体请求的装饰器, requestOpts => request, 将外层的配置参数进行预处理, 保证requestProxy只直接收axios的config
     const requestConnect = fn =>
-      /** 
-       * 
+      /**
+       *
        * @param {String} url 请求的url后缀
        * @param {Object} requestOpts 请求的配置项, 详见config.js中的requestDefaults
        * @param {Object} moreConfigs 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
@@ -202,25 +213,25 @@ function createAxiosService (instance, options) {
       getAsyncAxiosInstance,
       /**
        * get请求的封装
-       * 
+       *
        * @returns {Function} 业务层做请求的函数
        */
       get: requestConnect(function axiosServiceGet (url, request, moreConfigs) {
         /**
          * @param {Object} params 即get请求需要的数据
          * @param {Object} config 请求接口的配置项, 详见https://github.com/axios/axios#request-config
-         * 注意: get请求, 第一个参数传params, 
+         * 注意: get请求, 第一个参数传params,
          */
-        return (params, configs = {}) => request({ 
-          url, 
-          method: GET, 
-          ...configs, 
+        return (params, configs = {}) => request({
+          url,
+          method: GET,
+          ...configs,
           ...moreConfigs,
           // 保证params优先级最高, 加油💪
           params: {
             ...params,
             ...configs.params,
-          }, 
+          },
         })
       }),
       post: requestConnect(function axiosServicePost (url, request, moreConfigs) {
@@ -232,25 +243,19 @@ function createAxiosService (instance, options) {
       }),
       postXFormData: requestConnect(function axiosServicePostXForm (url, request, moreConfigs) {
         return (data, configs = {}) => {
-          return request({ 
-            url, 
-            method: POST, 
-            data,
-            transformRequest: [function (data = {}, headers) {
-              // if (typeof window === 'undefined') {
-              //   console.error('application/x-www-form-urlencoded类型, 请在客户端请求, url:', url)
-              // }
-    
-              return Object.keys(data)
-                .reduce((formData, key) => {
-                  formData.append(key, data[key])
-                  return formData
-                }, new FormData())
-            }], 
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              ...configs.headers
-            },
+          return request({
+            url,
+            method: POST,
+            data: Object.keys(data || {})
+              .reduce((formData, key) => {
+                formData.append(key, data[key])
+                return formData
+              }, new FormData()),
+            // FormData数据不要设置headers, 即使设置Content-Type, axios在FormData类型时候也会删除掉这个key, 详见: https://github.com/axios/axios/blob/master/lib/adapters/xhr.js#L16
+            // headers: {
+            //   'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+            //   ...configs.headers
+            // },
             ...configs,
             ...moreConfigs
           })
@@ -258,14 +263,17 @@ function createAxiosService (instance, options) {
       }),
       postXFormString: requestConnect(function axiosServicePostXFormString (url, request, moreConfigs) {
         return (data, configs = {}) => {
-          return request({ 
-            url, 
-            method: POST, 
+          return request({
+            url,
+            method: POST,
             data: qs.stringify(data),
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              ...configs.headers
-            },
+            // post请求: 浏览器会自动识别出Content-Type为: application/x-www-form-urlencoded, FormData有其他类型, 如: multipart/form-data
+            // 如果是json情况, axios在defaults.transformRequest中会将headers中的Content-Type设置为'application/json', 并将data对象JSON.strigify, 这样浏览器才能识别出Request Payload, 详见: https://github.com/axios/axios/blob/master/lib/defaults.js#L50
+            // 如果传入的是字符串'key1=value1&key2=value2', 浏览器会直接识别出为Form Data数据结构
+            // headers: {
+            //   'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+            //   ...configs.headers
+            // },
             ...configs,
             ...moreConfigs
           })
@@ -273,7 +281,7 @@ function createAxiosService (instance, options) {
       }),
       /**
        * resFul用的get请求
-       * 
+       *
        * @param {String} restFulUrl 请求的url, 且与上面的url配置有区别, 详见readme.md
        * @param {Object} requestOpts 请求配置项
        * @returns {Function} 具体请求的函数
@@ -281,26 +289,26 @@ function createAxiosService (instance, options) {
       restFulGet: requestConnect(function axiosServiceRestFulGet (restFulUrl, request, moreConfigs) {
         /**
          * @param {Object} urlData restFul中需要替换url的值, 拼接的过程serviceProxy会处理
-         * @param {Object} params 
+         * @param {Object} params
          * @param {Object} configs 请求配置项
          */
-        return (urlData, params, configs) => 
+        return (urlData, params, configs) =>
           request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs })
       }),
       restFulPost: requestConnect(function axiosServicePost (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) => 
+        return (urlData, data, configs) =>
           request({ url: formatRestFulUrl(restFulUrl, urlData), method: POST, data, ...configs, ...moreConfigs })
       }),
       delete: requestConnect(function axiosServiceDelete (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) => 
+        return (urlData, data, configs) =>
           request({ url: formatRestFulUrl(restFulUrl, urlData), method: DELETE, data, ...configs, ...moreConfigs })
       }),
       put: requestConnect(function axiosServicePut (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) => 
+        return (urlData, data, configs) =>
           request({ url: formatRestFulUrl(restFulUrl, urlData), method: PUT, data, ...configs, ...moreConfigs })
       }),
       patch: requestConnect(function axiosServicePatch (restFulUrl, request, ...moreConfigs) {
-        return (urlData, data, configs) => 
+        return (urlData, data, configs) =>
           request({ url: formatRestFulUrl(restFulUrl, urlData), method: PATCH, data, ...configs, ...moreConfigs })
       }),
       head: requestConnect(function axiosServiceHead (url, request, ...moreConfigs) {
@@ -317,7 +325,7 @@ function createAxiosService (instance, options) {
 
       })
     }
-    
+
     requests.restFulDelete = requests.delete
     // 兼容老版
     requests.postXForm = requests.postXFormData

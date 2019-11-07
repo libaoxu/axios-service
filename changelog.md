@@ -1,7 +1,16 @@
+### 1.3.6
+*2019-11-08*
+### Added
+  * axios instance请求成功后增加response undefined情况, [增加提示信息并处理返回值](./src/create.js#L44)
+  * axiosService返回的responseData中增加axios所返回的response字段, [详见](./src/create.js#L55)
+### Changed
+  * axios instance请求成功后去掉http状态码判断, 详见[axios/core/settle.js](https://github.com/axios/axios/blob/master/lib/core/settle.js#L13)
+  * codeKey 不匹配时, 修改logger.error文案, [详见](./src/create.js#L73)
+
 ### 1.3.5
 *2019-10-14*
 ### Added
-  * readme中增加关于`dataKey`为不存在的配置说明
+  * readme中增加关于`dataKey`为不存在的配置说明, 详见[datakey说明](./readme.md#L30)
   * example的server中增加`getInfoResponseString`接口, 不返回Json数据, 仅返回一个字符串
 
 

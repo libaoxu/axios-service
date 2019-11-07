@@ -2,19 +2,20 @@ export const deepCopy = (target, ...source) => {
 
 }
 
-
-export const formatRestFulUrl = (resfulUrl = '', urlData = {}) => 
+export const formatRestFulUrl = (resfulUrl = '', urlData = {}) =>
   Object.keys(urlData || {})
     .reduce((url, key) => url.replace(`$${key}`, urlData[key]), resfulUrl || '')
-    
+
 export const joinRootAndPath = (root, path) => {
-  let slashStartReplace = str => str.replace(/^\//, '') 
-  let slashEndReplace = str => str.replace(/\/$/, '') 
+  let slashStartReplace = str => str.replace(/^\//, '')
+  let slashEndReplace = str => str.replace(/\/$/, '')
   return `${slashEndReplace(root)}/${slashStartReplace(path)}`
 }
 
+export const combineURLs = joinRootAndPath
 
-const _toString = Object.prototype.toString
+export const toString = Object.prototype.toString
+export const hasOwnProperty = Object.prototype.hasOwnProperty
 
 /**
  * Determine if a value is an Array
@@ -98,7 +99,7 @@ export function forEach (obj, fn) {
   } else {
     // Iterate over object keys
     for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (hasOwnProperty.call(obj, key)) {
         fn(obj[key], key, obj)
       }
     }
@@ -178,6 +179,11 @@ export const logger = {
   log (...args) {
     /* eslint-disable no-console */
     console.log('[axios-service]', ...args)
+    /* eslint-enable no-console */
+  },
+  warn (...args) {
+    /* eslint-disable no-console */
+    console.warn('[axios-service]', ...args)
     /* eslint-enable no-console */
   },
   error (...args) {

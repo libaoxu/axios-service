@@ -3,12 +3,12 @@
 [![npm version](https://img.shields.io/npm/v/axios-service.svg)](https://www.npmjs.com/package/axios-service)
 [![build status](https://api.travis-ci.org/libaoxu/axios-service.svg)](https://travis-ci.org/libaoxu/axios-service)
 
-### 安装
+## 安装
 ```sh
 npm install axios-service -D
 ```
 
-### 全局配置
+## 全局配置
 > 注意: 全局设置为全局通用的配置, 需要再入口处设置, 下面配置项也可以针对某个请求单独设置
 
 配置参数说明
@@ -40,7 +40,7 @@ axiosService.init(axios, {
 })
 ```
 
-### 参数介绍
+## 参数介绍
 
 [getRequestsByRoot参数介绍](./src/create.js#L136)
 
@@ -56,7 +56,7 @@ axiosService.init(axios, {
 
 [更多apis用法及使用示例](./examples/client/apis.js)
 
-### apis配置示例
+## apis配置示例
 > 注意: 下面的root参数应该从配置项中根据环境来获取, 这里仅仅是演示
 
 ```js
@@ -148,7 +148,7 @@ getInfo({
 ```
 
 
-### restFul配置
+## restFul配置
 
 ```js
 import { getRequestsByRoot } from 'axios-service'
@@ -182,7 +182,7 @@ getHost({
 ```
 
 
-### 接口mock
+## 接口mock
 > axios-service与axios-mock-adapter并没有冲突, 只是
 
 1. axios-mock-adapter一旦使用, 全局所有用axios请求的接口都要进行mock, 如果大型项目, 每个接口都需要维护mock工作量成本过大, **本库提供的方案可以针对需要mock的接口单独做简单mock**, 可灵活处理
@@ -242,8 +242,10 @@ export default new Apis()
 
 ```
 
-### 消息装饰器
+## 消息装饰器
+
 > 消息装饰器是一个工具函数, 与axios-service没有关联, 可装饰任何返回Promise的函数, 该装饰器更多提供的只是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
+
 ```js
 import { getMessageDecorator, serviceHocs } from 'axios-service'
 // 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
@@ -301,8 +303,11 @@ api.getInfo().then(() => {
 // 该接口使用多次之后, 不需要每次都进行消息提示
 api.getInfo()
 ```
-### 其他高阶函数
-> requestOptsWrapper, setCustomParamsWrapper, setCustomDataWrapper
+
+## 其他高阶函数
+
+>主要包含: **requestOptsWrapper**, **setCustomParamsWrapper**, **setCustomDataWrapper**等装饰器, 下面是具体用法
+
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
 import { compose } from 'redux'
@@ -358,8 +363,7 @@ export const postInfoCustomComposedParamsAndData = composePost('/api/postInfoCus
 更多详细使用请参考: [api-request-custom](./examples/client/apis-request-custom.js)
 
 
-
-### 创建新实例
+## 创建新实例
 > 配合axios.create使用, 创建新的axiosService实例, 更多案例详情, 请查看使用案例[axios-service-create](./examples/client/axios-service-create.js)
 ```js
 const instance = axios.create()
@@ -396,10 +400,10 @@ export const axiosServiceCreateGetInfo = get('api/getCode1Info', null, {
 ```
 
 
-### 更多实际演示请查看代码
+## 更多实际演示请查看代码
 [examples](./examples/client/index.js)
 
-### 启动命令示例
+## 启动命令示例
 ```
 // api实际演示案例
 npm run example
@@ -408,18 +412,17 @@ npm run example
 npm run apiserver
 ```
 
-### 项目构建
+## 项目构建
 ```
 npm run build
 ```
 
-### 项目发布
+## 项目发布
 ```
 npm run pub
 ```
 
-
-#### 项目规范
+## 项目规范
 
 1. **readme**： 组件所涉及配置、方法和基础使用一定要详细和正确, 让开发人员复制过来就能用
 2. **example**： 一定要有示例, 其他开发人员才能更容易看懂
