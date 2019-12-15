@@ -27,6 +27,10 @@ export const isArray = function (val) {
   return toString.call(val) === '[object Array]';
 }
 
+export const isMustObject = function (val) {
+  return toString.call(val) === '[object Object]';
+}
+
 /**
  * Determine if a value is a String
  *
@@ -149,19 +153,27 @@ export function merge(/* obj1, obj2, obj3, ... */) {
  */
 export function deepMerge(/* obj1, obj2, obj3, ... */) {
   var result = {}
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = deepMerge(result[key], val)
-    } else if (typeof val === 'object') {
-      result[key] = deepMerge({}, val)
+  function assignValue (target, source) {
+    if (isMustObject(target) && isMustObject(source)) {
+      Object.keys(source).forEach(sourceKey => {
+        if (!target[sourceKey]) {
+          target[sourceKey] = source[sourceKey]
+        } else {
+          target[sourceKey] = deepMerge(target[sourceKey], source[sourceKey])
+        }
+      })
+    } else if (isArray(target) && isArray(source)) {
+      target = target.concat(source)
     } else {
-      result[key] = val
+      target = source
     }
+    return target
   }
 
   for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue)
+    result = assignValue(result, arguments[i])
   }
+
   return result
 }
 

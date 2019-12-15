@@ -155,7 +155,7 @@ function createAxiosService (instance, options) {
    * 根据根路径获取请求函数
    *
    * @param {any} baseConfigs axios的基础配置,
-   * @property {String} baseConfigs.root 根路劲
+   * @property {String} baseConfigs.root 根路径
    * @property {Boolean} baseConfigs.isCreateInstance 是否创建新实例, 即: axios.create
    *
    * @returns {Object} requests axios请求集合
@@ -207,6 +207,12 @@ function createAxiosService (instance, options) {
         const request = getRequest(requestOpts)
         return fn(url, request, ...args)
       }
+    
+    // merge tranform
+    const mergeTransform = (transforms = [], fn) => {
+      const defaults = options ? options.defaults : service.$http.defaults
+      return transforms.concat((defaults && defaults[fn]) || [])
+    }
 
     const requests = {
       getAxiosInstance,
@@ -246,11 +252,14 @@ function createAxiosService (instance, options) {
           return request({
             url,
             method: POST,
-            data: Object.keys(data || {})
-              .reduce((formData, key) => {
-                formData.append(key, data[key])
-                return formData
-              }, new FormData()),
+            data,
+            transformRequest: mergeTransform([function (data = {}, headers) {
+              return Object.keys(data)
+                .reduce((formData, key) => {
+                  formData.append(key, data[key])
+                  return formData
+                }, new FormData())
+            }], 'transformRequest'),
             // FormData数据不要设置headers, 即使设置Content-Type, axios在FormData类型时候也会删除掉这个key, 详见: https://github.com/axios/axios/blob/master/lib/adapters/xhr.js#L16
             // headers: {
             //   'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -266,7 +275,10 @@ function createAxiosService (instance, options) {
           return request({
             url,
             method: POST,
-            data: qs.stringify(data),
+            data,
+            transformRequest: mergeTransform([function (data = {}, headers) {
+              return qs.stringify(data)
+            }], 'transformRequest'),
             // post请求: 浏览器会自动识别出Content-Type为: application/x-www-form-urlencoded, FormData有其他类型, 如: multipart/form-data
             // 如果是json情况, axios在defaults.transformRequest中会将headers中的Content-Type设置为'application/json', 并将data对象JSON.strigify, 这样浏览器才能识别出Request Payload, 详见: https://github.com/axios/axios/blob/master/lib/defaults.js#L50
             // 如果传入的是字符串'key1=value1&key2=value2', 浏览器会直接识别出为Form Data数据结构

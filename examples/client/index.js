@@ -12,11 +12,18 @@ axios.interceptors.request.use(function (e) {
   return e
 })
 
-// axios.defaults.withCredentials = true
+axios.defaults.transformRequest = [function axiosTest (data) {
+  console.log('axios默认的transformRequest', data)
+  return data
+}]
 // console.log(axiosService)
 axiosService.init(axios, {
   defaults: {
-    withCredentials: true
+    withCredentials: false,
+    transformRequest: [function testTransformRequest (data) {
+      console.log('axiosService透传的transformRequest', data)
+      return data
+    }]
   },
   requestDefaults: {
     autoLoading: true,

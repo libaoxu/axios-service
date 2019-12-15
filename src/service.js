@@ -1,5 +1,5 @@
 import { defaults } from './config'
-import { extend } from './utils'
+import { extend, deepMerge } from './utils'
 
 export default class Service {
   constructor (options = {}) {
@@ -24,7 +24,7 @@ export default class Service {
 
   setDefaults (newConfig) {
     // 一定要保留this.$http.defaults旧地址引用不变
-    extend(this.$http.defaults, { ...defaults, ...newConfig })
+    extend(this.$http.defaults, deepMerge(this.$http.defaults, defaults, newConfig))
   }
 
   setRequestDefaults (newRequestOpts = {}) {
