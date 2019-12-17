@@ -27,6 +27,12 @@ export const isArray = function (val) {
   return toString.call(val) === '[object Array]';
 }
 
+/**
+ * Determine if a value is must an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, Array or otherwise false
+ */
 export const isMustObject = function (val) {
   return toString.call(val) === '[object Object]';
 }
