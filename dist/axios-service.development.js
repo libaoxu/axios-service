@@ -1150,6 +1150,14 @@ function createAxiosService(instance, options) {
       };
     };
 
+    var mergeTransform = function mergeTransform() {
+      var transforms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var fn = arguments[1];
+
+      var defaults = options ? options.defaults : service.$http.defaults;
+      return transforms.concat(defaults && defaults[fn] || []);
+    };
+
     var requests = {
       getAxiosInstance: getAxiosInstance,
       getAsyncAxiosInstance: getAsyncAxiosInstance,
@@ -1177,10 +1185,16 @@ function createAxiosService(instance, options) {
           return request(_extends({
             url: url,
             method: _requestTypes.POST,
-            data: Object.keys(data || {}).reduce(function (formData, key) {
-              formData.append(key, data[key]);
-              return formData;
-            }, new FormData())
+            data: data,
+            transformRequest: mergeTransform([function () {
+              var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+              var headers = arguments[1];
+
+              return Object.keys(data).reduce(function (formData, key) {
+                formData.append(key, data[key]);
+                return formData;
+              }, new FormData());
+            }], 'transformRequest')
           }, configs, moreConfigs));
         };
       }),
@@ -1191,7 +1205,13 @@ function createAxiosService(instance, options) {
           return request(_extends({
             url: url,
             method: _requestTypes.POST,
-            data: _qs2.default.stringify(data)
+            data: data,
+            transformRequest: mergeTransform([function () {
+              var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+              var headers = arguments[1];
+
+              return _qs2.default.stringify(data);
+            }], 'transformRequest')
           }, configs, moreConfigs));
         };
       }),
@@ -1307,7 +1327,7 @@ var getMessageDecorator = serviceHocs.getMessageDecorator,
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.3.6";
+var version = "1.3.7";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
@@ -1563,7 +1583,7 @@ var Service = function () {
   }, {
     key: 'setDefaults',
     value: function setDefaults(newConfig) {
-      (0, _utils.extend)(this.$http.defaults, _extends({}, _config.defaults, newConfig));
+      (0, _utils.extend)(this.$http.defaults, (0, _utils.deepMerge)(this.$http.defaults, _config.defaults, newConfig));
     }
   }, {
     key: 'setRequestDefaults',
@@ -1651,6 +1671,10 @@ var isArray = exports.isArray = function isArray(val) {
   return toString.call(val) === '[object Array]';
 };
 
+var isMustObject = exports.isMustObject = function isMustObject(val) {
+  return toString.call(val) === '[object Object]';
+};
+
 function isString(val) {
   return typeof val === 'string';
 }
@@ -1707,19 +1731,27 @@ function merge() {
 
 function deepMerge() {
   var result = {};
-  function assignValue(val, key) {
-    if (_typeof(result[key]) === 'object' && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
-      result[key] = deepMerge(result[key], val);
-    } else if ((typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
-      result[key] = deepMerge({}, val);
+  function assignValue(target, source) {
+    if (isMustObject(target) && isMustObject(source)) {
+      Object.keys(source).forEach(function (sourceKey) {
+        if (!target[sourceKey]) {
+          target[sourceKey] = source[sourceKey];
+        } else {
+          target[sourceKey] = deepMerge(target[sourceKey], source[sourceKey]);
+        }
+      });
+    } else if (isArray(target) && isArray(source)) {
+      target = target.concat(source);
     } else {
-      result[key] = val;
+      target = source;
     }
+    return target;
   }
 
   for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
+    result = assignValue(result, arguments[i]);
   }
+
   return result;
 }
 
