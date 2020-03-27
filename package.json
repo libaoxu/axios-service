@@ -1,9 +1,9 @@
 {
-  "name": "@inkefe/basic-module-template",
+  "name": "@inkefe/base-module-template",
   "version": "0.1.1",
   "description": "",
   "main": "index.js",
-  "author": "",
+  "author": "libaoxu",
   "scripts": {
     "example": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.example.conf.js --open",
     "build:dev": "cross-env NODE_ENV=development webpack --config build/webpack.prod.conf.js",
