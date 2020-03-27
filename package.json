@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "",
   "main": "index.js",
-  "author": "",
+  "author": "libaoxu",
   "scripts": {
     "example": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.example.conf.js --open",
     "build:dev": "cross-env NODE_ENV=development webpack --config build/webpack.prod.conf.js",
@@ -13,7 +13,7 @@
     "version:minor": "npm version minor",
     "version:major": "npm version major",
     "prepublish": "git pull && git pull origin master",
-    "publish": "npm run build && git push origin && git push origin --tags && npm publish",
+    "publish": "npm run build && git push origin && git push origin --tags && npm publish --access public",
     "publish:patch": "npm run lint && npm run version:patch && npm run publish",
     "publish:minor": "npm run lint && npm run version:minor && npm run publish",
     "publish:major": "npm run lint && npm run version:major && npm run publish",
@@ -51,5 +51,6 @@
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
     "webpack-merge": "^4.2.1"
-  }
+  },
+  "homepage": "https://code.inke.cn/opd/fe-aws/ik-modules-pro"
 }
