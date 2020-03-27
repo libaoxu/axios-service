@@ -43,16 +43,6 @@ npm run publish:minor
 npm run publish:major
 ```
 
-会进行代码提交和发布到cdn,访问路径为(其中module-name是要被替换的):
-
-开发包: `https:webcdn.inke.cn/tpc/common/${module-name}@${version}/${module-name}.development.js`
-
-生产包: `https:webcdn.inke.cn/tpc/common/${module-name}@${version}/${module-name}.production.min.js`
-
-如:
-
-https://webcdn.inke.cn/tpc/common/ik-bridgex@1.0.8/ik-bridgex.development.js
-
-https://webcdn.inke.cn/tpc/common/ik-bridgex@1.0.8/ik-bridgex.production.min.js
+会将代码发布到npm中[inkefe](https://www.npmjs.com/settings/inkefe/packages)组下, 如果没有权限请联系`李宝旭`or`leader`开通npm组权限
 
 9. 在[CHANGELOG.md]('./CHANGELOG.md)中维护修改内容
