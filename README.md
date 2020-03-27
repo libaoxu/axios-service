@@ -38,6 +38,9 @@ npm run publish:patch
 
 # 小版本迭代
 npm run publish:minor
+
+# 大版本迭代
+npm run publish:major
 ```
 
 会进行代码提交和发布到cdn,访问路径为(其中module-name是要被替换的):
