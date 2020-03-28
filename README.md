@@ -1,6 +1,9 @@
 # base-module-template
 
-## 如何使用
+## 安装
+
+## 使用文档
+
 1. 安装ik-cli, 详见[ik-cli](https://code.inke.cn/opd/fe-aws/ik-cli)
 
 1. 初始化项目
@@ -16,11 +19,15 @@ ik-cli init ik-modules-pro ik-bridgex
 
     `base-module-template -> ${module-name}`
 
-1. 修改package.json中`author`, `keyword`, `description`等信息
+1. 修改package.json中`author`, `keyword`, `description`, `homepage`等信息
+
+## 项目介绍
 
 1. 可以在`src`目录下进行开发, 通过`npm run example`
 
 1. ***开发完成一定要维护README***, ***开发完成一定要维护README***, ***开发完成一定要维护README***
+
+其中*使用文档* 部分应该全部替换为, 具体*module的使用文档*, 而不是保留`ik-modules-pro`的使用说明, 谨记!!!
 
 1. 构建
 
