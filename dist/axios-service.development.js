@@ -82,6 +82,273 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/@inkefe/create-decorator/index.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@inkefe/create-decorator/index.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+if (false) {} else {
+  module.exports = __webpack_require__(/*! ./lib/create-decorator.development.js */ "./node_modules/@inkefe/create-decorator/lib/create-decorator.development.js");
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@inkefe/create-decorator/lib/create-decorator.development.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@inkefe/create-decorator/lib/create-decorator.development.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(true)
+		module.exports = factory();
+	else {}
+})(window, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/*! exports provided: version, createDecorator, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "version", function() { return version; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createDecorator", function() { return createDecorator; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
+/**
+ * 创建装饰器, 所创建的装饰器支持普通函数、类prototype下面的函数、类prototype下面的箭头函数、类的静态函数的装饰, 而且能固定this;
+ * 等于在`core-decorators`下的autoBind和decorate双装饰的功能基础上, 增加了静态函数, 箭头函数, 普通函数的装饰, 代码量更精简下, 满足更多场景
+ * @param {Function} hocWrapper 基础函数的高阶函数
+ * @author libx@inke.cn
+ * @example
+ * 1. 创建装饰器
+ * const xxxDecorator = createDecorator(fn => (...args) => xxx, ...firstArgs)
+ * // 与第三方高阶函数结合
+ * const xxxDecorator = createDecorator(lodash.throlled, 300)
+ * 2. 使用装饰器
+ * 2.1 普通函数
+ * const fnProxy = xxxDecorator(fn)
+ * const fnProxyComposed = compose(xxxDecorator2, xxxDecorator1)(fn)
+ *
+ * 2.2 类
+ * class A {
+ *  @xxxDecorator
+ *  static fn() {}
+ *
+ *  @createDecorator(lodash.throttled, 300)
+ *  @xxxDecorator
+ *  fn() {}
+ *
+ *  @xxxDecorator
+ *  fnArrow = () => {}
+ * }
+ */
+
+var createDecorator = function createDecorator(hocWrapper) {
+  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  if (typeof hocWrapper !== 'function') throw Error('[create-decorator]: createDecorator请传入一个高阶函数');
+  return function handleDescriptor(target, key, descriptor) {
+    if (!descriptor && typeof target === 'function') {
+      // 返回执行具体业务逻辑的函数
+      return hocWrapper(target);
+    }
+
+    if (descriptor && !Object(_utils__WEBPACK_IMPORTED_MODULE_0__["isObject"])(descriptor)) {
+      throw Error('[create-decorator]: 装饰器使用错误, descriptor不是描述对象, 请检查@decorator是否为正确装饰器结构: function (target, name, descriptor) { ... }', 'descriptor: ', descriptor);
+    }
+
+    var configurable = descriptor.configurable,
+        enumerable = descriptor.enumerable,
+        writable = descriptor.writable;
+    var originalGet = descriptor.get;
+    var originalSet = descriptor.set;
+    var originalValue = descriptor.value;
+    var originInitializer = descriptor.initializer;
+    var isGetter = !!originalGet;
+
+    var defaultSetter = function defaultSetter(newValue) {
+      return originalValue = newValue;
+    };
+
+    var wrappedFn;
+    var desc = {
+      configurable: configurable,
+      enumerable: enumerable
+    }; // 当非箭头函数 或 静态箭头函数时候, 不能有即有initializer 和 value(get、set)属性
+    // 构建报错如(Invalid property descriptor Cannot both specify accesssors and a value or writable attirbute)
+    // 所以这里将initializer 与 get set区分开
+
+    if (typeof originInitializer === 'function') {
+      desc.initializer = function initializer() {
+        if (!wrappedFn) {
+          // 这边在编译时候, 将this传入作用域curry起来, 等于间接固定了this
+          // 这个realMethod是类中的具体执行业务逻辑的函数
+          var realMethod = originInitializer.call(this).bind(this); // 这个是通过高阶函数装饰之后的代理函数, 调用者调用的就是这个函数
+
+          wrappedFn = hocWrapper.call.apply(hocWrapper, [this, realMethod].concat(args));
+        }
+
+        return function realMethodCall() {
+          var _wrappedFn;
+
+          for (var _len2 = arguments.length, nextArgs = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            nextArgs[_key2] = arguments[_key2];
+          }
+
+          return (_wrappedFn = wrappedFn).call.apply(_wrappedFn, [this].concat(nextArgs));
+        };
+      };
+    } else {
+      desc.get = function get() {
+        if (wrappedFn) return wrappedFn;
+        var realMethod;
+
+        if (isGetter) {
+          realMethod = originalGet.call(this).bind(this);
+        } else if (typeof originalValue === 'function') {
+          realMethod = originalValue.bind(this);
+        } else {
+          throw Error('[create-decorator]: descriptor\'s `value` or `get` property is not a function', descriptor);
+        }
+
+        wrappedFn = hocWrapper.call.apply(hocWrapper, [this, realMethod].concat(args));
+        return wrappedFn;
+      };
+
+      desc.set = isGetter ? originalSet : defaultSetter;
+    }
+
+    return desc;
+  };
+}; // eslint-disable-next-line no-undef
+
+
+var version = "0.1.0";
+createDecorator.version = version;
+
+/* harmony default export */ __webpack_exports__["default"] = (createDecorator);
+
+/***/ }),
+
+/***/ "./src/utils.js":
+/*!**********************!*\
+  !*** ./src/utils.js ***!
+  \**********************/
+/*! exports provided: isObject */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
+var isObject = function isObject(value) {
+  return Object.prototype.toString.call(value) === '[object Object]';
+};
+
+/***/ })
+
+/******/ });
+});
+//# sourceMappingURL=create-decorator.development.js.map
+
+/***/ }),
+
 /***/ "./node_modules/qs/lib/formats.js":
 /*!****************************************!*\
   !*** ./node_modules/qs/lib/formats.js ***!
@@ -986,7 +1253,7 @@ function createAxiosService(instance, options) {
     instance: instance
   }, options));
 
-  var responseDecorator = function responseDecorator(instance, requestOpts) {
+  var getRequestProxy = function getRequestProxy(instance, requestOpts) {
     var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
         msgKey = _service$requestDefau.msgKey,
         codeKey = _service$requestDefau.codeKey,
@@ -1006,7 +1273,11 @@ function createAxiosService(instance, options) {
         }
 
         var responseData = _extends({}, response.data);
-        responseData.response = response;
+        if ('response' in responseData) {
+          responseData.__originResponse = response;
+        } else {
+          responseData.response = response;
+        }
 
         if (!dataKey) {
           return Promise.resolve(responseData);
@@ -1036,7 +1307,7 @@ function createAxiosService(instance, options) {
         isCreateInstance = _defaultBaseConfig$ba.isCreateInstance;
 
     if (root === undefined) {
-      console.error('请传入正确的请求根路径, 如: / 或 https://api.github.com');
+      _utils.logger.error('请传入正确的请求根路径, 如: / 或 https://api.github.com');
     }
 
     var axiosInstance = void 0;
@@ -1117,10 +1388,10 @@ function createAxiosService(instance, options) {
       var asyncAxiosInstance = getAsyncAxiosInstance();
 
       if (axiosInstance) {
-        _request = responseDecorator(axiosInstance, requestOpts);
+        _request = getRequestProxy(axiosInstance, requestOpts);
       } else {
         asyncAxiosInstance && asyncAxiosInstance.then(function (axiosInstance) {
-          _request = responseDecorator(axiosInstance, requestOpts);
+          _request = getRequestProxy(axiosInstance, requestOpts);
         });
       }
 
@@ -1327,7 +1598,7 @@ var getMessageDecorator = serviceHocs.getMessageDecorator,
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.3.7";
+var version = "1.4.0";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
@@ -1386,35 +1657,33 @@ var HEAD = exports.HEAD = 'head';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.delayDecorator = exports.getDelayDecorator = exports.setDataDecorator = exports.setParamsDecorator = exports.setCustomDataWrapper = exports.setCustomParamsWrapper = exports.requestOptsWrapper = exports.getErrorMsg = exports.getMessageDecorator = exports.mockDecorator = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 exports.getMockDecoratorByEnv = getMockDecoratorByEnv;
+
+var _createDecorator = __webpack_require__(/*! @inkefe/create-decorator */ "./node_modules/@inkefe/create-decorator/index.js");
+
+var _createDecorator2 = _interopRequireDefault(_createDecorator);
+
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function getMockDecoratorByEnv(isDev) {
   return function mockDecorator(mockFn) {
-    return function apiDecorator(target, property, descriptor) {
-      var apiFn = void 0;
-      var applyApiWithEnv = function applyApiWithEnv() {
+    return (0, _createDecorator2.default)(function (apiFn) {
+      return function () {
         if (isDev) {
           return mockFn.apply(undefined, arguments);
         } else {
           return apiFn.apply(undefined, arguments);
         }
       };
-      if (!descriptor && typeof target === 'function') {
-        apiFn = target;
-        return applyApiWithEnv;
-      } else {
-        var initialFunc = descriptor.initializer || descriptor.value;
-        apiFn = initialFunc() || function () {};
-        descriptor.initializer = descriptor.value = function (_) {
-          return applyApiWithEnv;
-        };
-        return descriptor;
-      }
-    };
+    });
   };
 }
 
@@ -1426,26 +1695,23 @@ var getMessageDecorator = exports.getMessageDecorator = function getMessageDecor
         successMsg = _ref.successMsg,
         errorMsg = _ref.errorMsg;
 
-    return function (target, name, descriptor) {
-      var noop = function noop() {};
-
-      var alert = typeof window !== 'undefined' ? window.alert : console.log;
-      var getToast = function getToast(name) {
-        return (typeof toast === 'undefined' ? 'undefined' : _typeof(toast)) === 'object' && typeof toast[name] === 'function' ? toast[name] : alert;
+    var alert = typeof window !== 'undefined' ? window.alert : console.log;
+    var getToast = function getToast(name) {
+      return (typeof toast === 'undefined' ? 'undefined' : _typeof(toast)) === 'object' && typeof toast[name] === 'function' ? toast[name] : alert;
+    };
+    var messageGetter = function messageGetter(msg) {
+      return typeof msg === 'function' ? msg : function (_) {
+        return msg;
       };
-      var messageGetter = function messageGetter(msg) {
-        return typeof msg === 'function' ? msg : function (_) {
-          return msg;
-        };
-      };
-      var successToast = getToast('success');
-      var errorToast = getToast('error');
-      var getSuccessMsg = messageGetter(successMsg);
-      var getErrorMsg = messageGetter(errorMsg);
-      var origin = void 0;
+    };
+    var successToast = getToast('success');
+    var errorToast = getToast('error');
+    var getSuccessMsg = messageGetter(successMsg);
+    var getErrorMsg = messageGetter(errorMsg);
 
-      var wrapper = function wrapper() {
-        return origin.apply(undefined, arguments).then(function (res) {
+    return (0, _createDecorator2.default)(function (fn) {
+      return function () {
+        return typeof fn === 'function' && fn.apply(undefined, arguments).then(function (res) {
           var msg = getSuccessMsg(res);
           msg && successToast(msg);
           return Promise.resolve(res);
@@ -1455,20 +1721,7 @@ var getMessageDecorator = exports.getMessageDecorator = function getMessageDecor
           return Promise.reject(err);
         });
       };
-
-      if (!descriptor && typeof target === 'function') {
-        origin = target;
-        return wrapper;
-      } else {
-        var initializer = descriptor.value || descriptor.initializer;
-        origin = initializer() || noop;
-        descriptor.value = descriptor.initializer = function (_) {
-          return wrapper;
-        };
-      }
-
-      return descriptor;
-    };
+    });
   };
 };
 
@@ -1506,16 +1759,17 @@ var requestConnector = function requestConnector(fn) {
   };
 };
 
-var setCustomParamsWrapper = exports.setCustomParamsWrapper = requestConnector(function (request, customParams) {
+var requestToSetParams = function requestToSetParams(request, customParams) {
   return function (data) {
     var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    return request(data, _extends({}, config, {
+
+    return typeof request === 'function' && request(data, _extends({}, config, {
       params: _extends({}, config.params, customParams)
     }));
   };
-});
+};
 
-var setCustomDataWrapper = exports.setCustomDataWrapper = requestConnector(function (request, customData) {
+var requestToSetData = function requestToSetData(request, customData) {
   return function (data) {
     for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
       args[_key4 - 1] = arguments[_key4];
@@ -1523,7 +1777,49 @@ var setCustomDataWrapper = exports.setCustomDataWrapper = requestConnector(funct
 
     return request.apply(undefined, [_extends({}, customData, data)].concat(args));
   };
-});
+};
+
+var decoratorsReadmeUrl = 'https://github.com/libaoxu/axios-service#%E6%9B%B4%E5%A4%9A%E8%A3%85%E9%A5%B0%E5%99%A8';
+
+var setCustomParamsWrapper = exports.setCustomParamsWrapper = (0, _utils.compose)((0, _utils.deprecatedHoc)('setCustomParamsWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetParams);
+
+var setCustomDataWrapper = exports.setCustomDataWrapper = (0, _utils.compose)((0, _utils.deprecatedHoc)('setCustomDataWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetData);
+
+var setParamsDecorator = exports.setParamsDecorator = function setParamsDecorator(customParams) {
+  return (0, _createDecorator2.default)(function (fn) {
+    return requestToSetParams(fn, customParams);
+  });
+};
+
+var setDataDecorator = exports.setDataDecorator = function setDataDecorator(customData) {
+  return (0, _createDecorator2.default)(function (fn) {
+    return requestToSetData(fn, customData);
+  });
+};
+
+var getDelayDecorator = exports.getDelayDecorator = function getDelayDecorator(isDev) {
+  return function (wait) {
+    return (0, _createDecorator2.default)(function (fn) {
+      return function () {
+        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+          args[_key5] = arguments[_key5];
+        }
+
+        if (isDev) {
+          return new Promise(function (resolve) {
+            setTimeout(function () {
+              resolve(fn.apply(undefined, args));
+            }, wait || 0);
+          });
+        } else {
+          return fn.apply(undefined, args);
+        }
+      };
+    });
+  };
+};
+
+var delayDecorator = exports.delayDecorator = getDelayDecorator("development" === 'development');
 
 /***/ }),
 
@@ -1790,6 +2086,38 @@ var logger = exports.logger = {
 
     (_console3 = console).error.apply(_console3, ['[axios-service]'].concat(args));
   }
+};
+
+var compose = exports.compose = function compose() {
+  for (var _len4 = arguments.length, funcs = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+    funcs[_key4] = arguments[_key4];
+  }
+
+  if (funcs.length === 0) {
+    return function (arg) {
+      return arg;
+    };
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  return funcs.reduce(function (a, b) {
+    return function () {
+      return a(b.apply(undefined, arguments));
+    };
+  });
+};
+
+var deprecatedHoc = exports.deprecatedHoc = function deprecatedHoc(fnName) {
+  var readmeUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://github.com/libaoxu/axios-service';
+  return function (fn) {
+    return function () {
+      logger.warn('\uD83D\uDEAB' + (fnName || fn.name) + '\u5DF2\u7ECF\u5E9F\u5F03, \u66F4\u591A\u7528\u6CD5\u8BF7\u53C2\u8003: ' + readmeUrl);
+      return fn.apply(undefined, arguments);
+    };
+  };
 };
 
 /***/ })
