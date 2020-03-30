@@ -186,7 +186,7 @@ getHost({
 ```
 
 
-## 接口mock
+## mock装饰器
 > axios-service与axios-mock-adapter并没有冲突, 只是
 
 1. axios-mock-adapter一旦使用, 全局所有用axios请求的接口都要进行mock, 如果大型项目, 每个接口都需要维护mock工作量成本过大, **本库提供的方案可以针对需要mock的接口单独做简单mock**, 可灵活处理
@@ -289,8 +289,21 @@ class Apis {
 ```
 
 未使用消息装饰器接口的写法
+
 ```js
 // 如果api.getInfo被多次调用, 每次调用都需要写toast相关逻辑
+api.getInfo().then(() => {
+  toast.success('请求成功')
+}, () => {
+  toast.error('请求失败')
+})
+
+api.getInfo().then(() => {
+  toast.success('请求成功')
+}, () => {
+  toast.error('请求失败')
+})
+
 api.getInfo().then(() => {
   toast.success('请求成功')
 }, () => {
@@ -302,11 +315,17 @@ api.getInfo().then(() => {
 ```js
 // 该接口使用多次之后, 不需要每次都进行消息提示
 api.getInfo()
+
+api.getInfo()
+
+api.getInfo()
 ```
 
-## 其他装饰器
+## 更多装饰器
 
-> 主要包含**setDataDecorator**、**setParamsDecorator**等装饰器, 下面是具体用法:
+> 主要包含*setDataDecorator*、*setParamsDecorator*、*delayDecorator*等装饰器, 下面是具体用法:
+
+其中`setDataDecorator`代替原`setCustomDataWrapper`高阶函数用法, `setParamsDecorator`代替原`setCustomParamsWrapper`高阶函数用法
 
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
@@ -349,6 +368,7 @@ class Apis {
 
   @messageDecorator({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
   @mockGetInfo
+  @delayDecorator(3000)
   @setParamsDecorator(customParams)
   @setDataDecorator(customData)
   getInfoWithMoreDecorators = post('/api/getInfoCustom')
@@ -357,11 +377,11 @@ class Apis {
 export default new Apis()
 ```
 
-项目示例: [apis-request-decorators](./examples/client/apis-request-decorators.js)
+更多详细使用请参考: [apis-request-decorators](./examples/client/apis-request-decorators.js)
 
 ## 其他高阶函数
 
->主要包含: **requestOptsWrapper**, 下面是具体用法:
+**requestOptsWrapper**
 
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
@@ -397,6 +417,63 @@ export const postInfoCustom1 = post('/api/postInfoCustom1')
 export const postInfoCustom2 = post('/api/postInfoCustom2')
 export const postInfoCustom3 = post('/api/postInfoCustom3')
 ```
+
+**setCustomDataWrapper** 和 **setCustomParamsWrapper**
+
+这两个函数已经`🚫 DEPRECATED`不建议使用, 请使用`更多装饰器`中的装饰器来解决相同场景的业务
+
+```js
+import { serviceHocs, getRequestsByRoot } from 'axios-service'
+import { compose } from 'redux'
+
+const { requestOptsWrapper, setCustomDataWrapper, setCustomParamsWrapper } = serviceHocs
+const { get: baseGet, post: basePost, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
+
+const requestOpts = {
+  msgKey: 'error_msg',
+  codeKey: 'dm_error',
+  successCode: 0
+}
+
+const customData = { name: 'libx', birth: '1996' }
+
+const customParams = { uid: 123, sid: 456 }
+
+const get = requestOptsWrapper(baseGet, requestOpts)
+
+const post = requestOptsWrapper(basePost, requestOpts)
+
+// basic
+const composeGet = compose(
+  fn => setCustomDataWrapper(fn, customData),
+  fn => requestOptsWrapper(fn, requestOpts),
+)(baseGet)
+
+// or
+const requestHoc = compose(
+  fn => setCustomDataWrapper(fn, customData),
+  fn => requestOptsWrapper(fn, requestOpts),
+  fn => setCustomParamsWrapper(fn, customParams),
+)
+
+const composePost = requestHoc(post)
+const composeGet = requestHoc(get)
+
+export const getInfoCustom = get('/api/getInfoCustom')
+
+export const postInfoCustom = post('/api/postInfoCustom')
+
+/**
+ * 混合 setCustomDataWrapper 和 requestOptsWrapper 两种预置
+ */
+export const getInfoCustomComposedData = composeGet('/api/getInfoCustom')
+
+/**
+ * 混合 requestOptsWrapper 和 setCustomParamsWrapper 两种预置
+ */
+export const postInfoCustomComposedParamsAndData = composePost('/api/postInfoCustom')
+```
+
 更多详细使用请参考: [api-request-custom](./examples/client/apis-request-custom.js)
 
 

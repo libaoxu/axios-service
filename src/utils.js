@@ -210,3 +210,20 @@ export const logger = {
     /* eslint-enable no-console */
   },
 }
+
+export const compose = (...funcs) => {
+  if (funcs.length === 0) {
+    return arg => arg
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0]
+  }
+
+  return funcs.reduce((a, b) => (...args) => a(b(...args)))
+}
+
+export const deprecatedHoc = (fnName, readmeUrl = 'https://github.com/libaoxu/axios-service') => fn => (...args) => {
+  logger.warn(`🚫${fnName || fn.name}已经废弃, 更多用法请参考: ${readmeUrl}`)
+  return fn(...args)
+}

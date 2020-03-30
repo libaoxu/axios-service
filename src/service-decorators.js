@@ -4,6 +4,7 @@
  * TODO: 需要使用createDecorator来重写
  */
 import createDecorator from '@inkefe/create-decorator'
+import { deprecatedHoc, compose } from './utils'
 
 /**
  * 通过环境变量获取mock装饰器
@@ -150,6 +151,8 @@ const requestToSetParams = (request, customParams) => (data, config = {}) => {
 
 const requestToSetData = (request, customData) => (data, ...args) => request({ ...customData, ...data }, ...args)
 
+const decoratorsReadmeUrl = 'https://github.com/libaoxu/axios-service#%E6%9B%B4%E5%A4%9A%E8%A3%85%E9%A5%B0%E5%99%A8'
+
 /**
  * @name 满足提前预置自定义params, 不管get or post 都扩展到 Query String Parameters上
  * @param {Function} fn axios-service 的 getRequestsByRoot 产出的requestPathWrapper函数, 如get, post
@@ -167,7 +170,10 @@ const requestToSetData = (request, customData) => (data, ...args) => request({ .
  *  postB = postWithAtom('/api/postB')
  * }
  */
-export const setCustomParamsWrapper = requestConnector(requestToSetParams)
+export const setCustomParamsWrapper = compose(
+  deprecatedHoc('setCustomParamsWrapper', decoratorsReadmeUrl),
+  requestConnector
+)(requestToSetParams)
 
 /**
  * data扩展: get请求扩展到 Query String Parameters上, post请求扩展到 payload上
@@ -186,10 +192,13 @@ export const setCustomParamsWrapper = requestConnector(requestToSetParams)
  *  postB = postWithCustomData('/api/postB')
  * }
  */
-export const setCustomDataWrapper = requestConnector(requestToSetData)
+export const setCustomDataWrapper = compose(
+  deprecatedHoc('setCustomDataWrapper', decoratorsReadmeUrl),
+  requestConnector
+)(requestToSetData)
 
 /**
- * 装饰器目的: 在请求中可以将固定数据注入到queryString中
+ * 装饰器目的: 可以将固定数据注入到请求的queryString中
  * @param {Object} customParams 需要在request时注入到queryString中的数据
  * @example
  * class Apis {
@@ -197,12 +206,10 @@ export const setCustomDataWrapper = requestConnector(requestToSetData)
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setParamsDecorator = (customParams) => {
-  return createDecorator((fn) => requestToSetParams(fn, customParams))
-}
+export const setParamsDecorator = customParams => createDecorator((fn) => requestToSetParams(fn, customParams))
 
 /**
- * 装饰器目的为: 在post请求时候, 可以这些预置的customDatac参数, 注入到body体中
+ * 装饰器目的为: 可以将固定数据注入请求的数据中, post(将数据固定到body体中), get请求(将数据固定到query string中)
  * @param {Object} customData 需要在request时注入到body体中的数据
  * @example
  * class Apis {
@@ -210,6 +217,38 @@ export const setParamsDecorator = (customParams) => {
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setDataDecorator = (customData) => {
-  return createDecorator((fn) => requestToSetData(fn, customData))
+export const setDataDecorator = customData => createDecorator((fn) => requestToSetData(fn, customData))
+
+/**
+ * 根据环境变量获取延时装饰器, 做一个保护机制, 以防production环境也延时, 引起线上bug
+ * @param {Boolean} isDev 是否为开发环境
+ * web端:
+ * const delayDecorator = getDelayDecorator(process.env.NODE_ENV === 'development')
+ * RN端:
+ * const delayDecorator = getDelayDecorator(__DEV__)
+ * 小程序端:
+ * const delayDecorator = getDelayDecorator(环境变量名 === dev环境变量值)
+ */
+export const getDelayDecorator = isDev => {
+  return (wait) => createDecorator(fn => (...args) => {
+    if (isDev) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(fn(...args))
+        }, wait || 0);
+      })
+    } else {
+      return fn(...args)
+    }
+  })
 }
+
+/**
+ * 延时装饰器, 已经根据环境变量区分, 适用于web端项目, 小程序和rn端应该使用上面`getDelayDecorator`来创建新的延时装饰器
+ * class A {
+ *  // 延时3s请求
+ *  @delayDecorator(3000)
+ *  getUserInfo = get('/user/info')
+ * }
+ */
+export const delayDecorator = getDelayDecorator(process.env.NODE_ENV === 'development')

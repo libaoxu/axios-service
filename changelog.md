@@ -1,3 +1,19 @@
+### 1.4.0
+*2020-03-30*
+### Added
+  * pkg引入[create-decorator](https://github.com/inkefe/create-decorator), 修改`service-decorators`中各种装饰器底层逻辑, 如[service-decorators.js](./src/service-decorators.js)
+  * 引入最新的`setDataDecorator`、`setParamsDecorator`、`delayDecorator`等装饰器, 扩展`apis`装饰器功能, 详见[apis-request-decorators](./examples/client/apis-request-decorators.js)
+  * 将`setCustomDataWrapper`和`setCustomParamsWrapper`标志为废弃的api, 避免高阶函数与装饰器想混淆, 后面统一用装饰器思想来抽象配置化逻辑
+
+### Changed
+  * 去掉README中`autoLoading`这个参数, `autoLoading`这个配置项方案早已废弃掉, 但是说明文档中有误导的嫌疑
+  * `request`函数中会判断response.data中是否再有`response`字段, 如果存在, 则给*response.data*添加`__originResponse`字段, 详见: [request](./src/create.js#L55)
+
+### Fixed
+  * `example/server` 兼容不存在`req.headers.origin`等常见, 详见[server.js](./examples/server/index.js#L56)
+  * `example/client` 中保留`axios.defaults.transformRequest`逻辑, 不做强硬替换, 否则会出现`Content-Type`中`application/json`失效等情况, 详见[axiosService.init](./examples/client/index.js#L20)
+
+
 ### 1.3.7
 *2019-12-17*
 ### Added

@@ -2,7 +2,7 @@ import { serviceHocs, getRequestsByRoot, getMockDecoratorByEnv } from 'axios-ser
 import { messageDecorator, requestFailErrMsg } from './service-hocs'
 import { mockGetInfo } from './apis-mock'
 
-const { requestOptsWrapper, setDataDecorator, setParamsDecorator } = serviceHocs
+const { requestOptsWrapper, setDataDecorator, setParamsDecorator, delayDecorator } = serviceHocs
 const { get: baseGet, post: basePost } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
 const prodMockDecorator = getMockDecoratorByEnv(false)
@@ -26,10 +26,11 @@ class Apis {
 
   postInfoCustom = post('/api/postInfoCustom')
 
-  // query string中预置参数
+  // 将customParams 固定到请求的query string中
   @setParamsDecorator(customParams)
   getInfoWithParamsDecorator = get('/api/getInfoCustom')
 
+  // 将customData 固定到请求的body体中
   @setDataDecorator(customData)
   getInfoWithDataDecorator = post('/api/getInfoCustom')
 
@@ -39,7 +40,8 @@ class Apis {
 
   @messageDecorator({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
   @prodMockDecorator(() => {})
-  // @mockGetInfo
+  @delayDecorator(3000)
+  @mockGetInfo
   @setParamsDecorator(customParams)
   @setDataDecorator(customData)
   getInfoWithMoreDecorators = post('/api/getInfoCustom')
