@@ -5,7 +5,7 @@
   * 增加isMustObject工具函数 判断原型字符串[object Object]情况 [详见](./src/utils.js#L36)
 ### Changed
   * 重写deepMerge工具函数 增加value是数组情况下的merge [详见](./src/utils.js#L154)
-  * getRequestsByRoot所返回的requests对象中, `postXFormData`, `postXFromString` data层处理改用transformRequset处理，可以merge
+  * getRequestsByRoot所返回的requests对象中, `postXFormData`, `postXFromString` data层处理改用transformRequset处理, 可保`interceptors`data数据统一，如[mergeTransfrom](./src/create.js#L211)
   * service实例setDefault 由简单merge改为deepMerge 兼容transformRequset transformResponse [详见](./src/service.js#27)
 
 ### 1.3.6
