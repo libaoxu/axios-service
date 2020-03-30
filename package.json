@@ -1,6 +1,6 @@
 {
   "name": "axios-service",
-  "version": "1.3.7",
+  "version": "1.4.0",
   "description": "combine with axios to make xhr more easlier and standard and robust to use when coding",
   "main": "index.js",
   "directories": {
