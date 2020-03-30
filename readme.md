@@ -323,16 +323,18 @@ api.getInfo()
 
 ## 更多装饰器
 
-> 主要包含*setDataDecorator*、*setParamsDecorator*、*delayDecorator*等装饰器, 下面是具体用法:
+> 主要包含[*setDataDecorator*](./src/service-decorators.js#L211)、[*setParamsDecorator*](./src/service-decorators.js#L200)、[*delayDecorator*](./src/service-decorators.js#L246)等装饰器, 下面是具体用法:
 
 其中`setDataDecorator`代替原`setCustomDataWrapper`高阶函数用法, `setParamsDecorator`代替原`setCustomParamsWrapper`高阶函数用法
+
+其中`delayDecorator`这里是直接给web端用的, 内置production保护机制, 如果是rn端和小程序端, 请参考中[`getDelayDecorator`](./src/service-decorators.js#L222)用法
 
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
 import { messageDecorator, requestFailErrMsg } from './service-hocs'
 import { mockGetInfo } from './apis-mock'
 
-const { requestOptsWrapper, setDataDecorator, setParamsDecorator } = serviceHocs
+const { requestOptsWrapper, setDataDecorator, setParamsDecorator, delayDecorator } = serviceHocs
 const { get: baseGet, post: basePost } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
 const requestOpts = {
@@ -368,6 +370,7 @@ class Apis {
 
   @messageDecorator({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
   @mockGetInfo
+  // 延时3s, 注意: 这里是web端, 内置production保护机制, 如果是rn端和小程序端, 请参考中`getDelayDecorator`用法
   @delayDecorator(3000)
   @setParamsDecorator(customParams)
   @setDataDecorator(customData)
@@ -381,7 +384,7 @@ export default new Apis()
 
 ## 其他高阶函数
 
-**requestOptsWrapper**
+[**requestOptsWrapper**](./src/service-decorators.js#L105)
 
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
