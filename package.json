@@ -35,6 +35,7 @@
   },
   "homepage": "https://github.com/libaoxu/axios-service#readme",
   "devDependencies": {
+    "@inkefe/create-decorator": "^0.1.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",

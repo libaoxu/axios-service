@@ -51,9 +51,15 @@ dirs = listDirs(__dirname);
 
 
 server = http.createServer(function (req, res) {
-  var url = req.url;
   var origin = req.headers.origin
-  var { pathname } = new URL(req.headers.origin + req.url)
+  var url
+  try {
+    url = new URL(req.headers.origin + req.url)
+  } catch (e) {
+    return send200(res)
+  }
+
+  var pathname = url && url.pathname
   var writeHead = res.writeHead.bind(res)
 
   res.writeHead = function (status, params) {

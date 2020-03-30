@@ -10,7 +10,7 @@
 
 <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
 <script src="../dist/axios-service.js"></script>
-<script>  
+<script>
 var service = axiosService.service
 var getRequestsByRoot = axiosService.getRequestsByRoot
 
@@ -19,7 +19,6 @@ service.init(axios, {
     withCredentials: true
   },
   requestDefaults: {
-    autoLoading: true,
     // server端请求msg
     msgKey: 'msg',
     // server端数据的key

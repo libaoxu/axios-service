@@ -4,6 +4,7 @@ import jsonp from 'jsonp'
 import axios from 'axios'
 import { axiosServiceCreateGetInfo } from './axios-service-create';
 import { getInfoCustom, postInfoCustom, getInfoCustomComposedData, postInfoCustomComposedParamsAndData } from './apis-request-custom';
+import apiRequestDecorators from './apis-request-decorators'
 
 // todo 全局的loading队列
 axios.interceptors.request.use(function (e) {
@@ -12,21 +13,16 @@ axios.interceptors.request.use(function (e) {
   return e
 })
 
-axios.defaults.transformRequest = [function axiosTest (data) {
-  console.log('axios默认的transformRequest', data)
-  return data
-}]
 // console.log(axiosService)
 axiosService.init(axios, {
   defaults: {
     withCredentials: false,
-    transformRequest: [function testTransformRequest (data) {
+    transformRequest: axios.defaults.transformRequest.concat([function testTransformRequest (data) {
       console.log('axiosService透传的transformRequest', data)
       return data
-    }]
+    }])
   },
   requestDefaults: {
-    autoLoading: true,
     // server端请求msg
     msgKey: 'message',
     // server端数据的key
@@ -146,6 +142,22 @@ const requestChains = [
         'ticket': 'mo tian lun'
       }
     })
+  },
+  {
+    text: '装饰器 预置数据到query string',
+    fn: apiRequestDecorators.getInfoWithParamsDecorator
+  },
+  {
+    text: '装饰器 预置数据到body体中',
+    fn: apiRequestDecorators.getInfoWithDataDecorator
+  },
+  {
+    text: '装饰器 预置数据query string 和 body',
+    fn: apiRequestDecorators.getInfoWithParamsAndDataDecorator
+  },
+  {
+    text: '装饰器 大混合',
+    fn: apiRequestDecorators.getInfoWithMoreDecorators
   },
 ]
 

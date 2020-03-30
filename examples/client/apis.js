@@ -15,9 +15,7 @@ const { get: gitHubGet, restFulGet: gitHubRestFulGet } = getRequestsByRoot({ roo
 // dataKey为null时, 会直接将http请求中的data字段返回
 export const getInfoNoDataKey = get('api/getInfoResponseString', { dataKey: null })
 
-export const getInfo = get('api/getInfo', null, {
-  autoLoading: false
-})
+export const getInfo = get('api/getInfo', null)
 
 export const postInfo = post('api/postInfo')
 

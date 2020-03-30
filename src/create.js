@@ -24,7 +24,7 @@ function createAxiosService (instance, options) {
    * @param {Axios} instance axios实例
    * @param {Object} requestOpts axiosService请求配置项, 包含状态检测等, 详见config.requestDefaults
    */
-  const responseDecorator = function responseDecorator (instance, requestOpts) {
+  const getRequestProxy = function getRequestProxy (instance, requestOpts) {
     const { msgKey, codeKey, dataKey, successCode } = {
       ...service.requestDefaults,
       ...requestOpts,
@@ -52,7 +52,11 @@ function createAxiosService (instance, options) {
           }
 
           const responseData = { ...response.data }
-          responseData.response = response
+          if ('response' in responseData) {
+            responseData.__originResponse = response
+          } else {
+            responseData.response = response
+          }
 
           // 如果不存在dataKey, 则不处理data相关的值, 仅将data返回回去
           if (!dataKey) {
@@ -82,8 +86,7 @@ function createAxiosService (instance, options) {
   const handleAxiosInstances = function handleAxiosInstances (baseConfigs) {
     const { root, isCreateInstance } = { ...defaultBaseConfig, ...baseConfigs }
     if (root === undefined) {
-      // eslint-disable-next-line no-console
-      console.error('请传入正确的请求根路径, 如: / 或 https://api.github.com')
+      logger.error('请传入正确的请求根路径, 如: / 或 https://api.github.com')
     }
 
     let axiosInstance
@@ -178,10 +181,10 @@ function createAxiosService (instance, options) {
       const asyncAxiosInstance = getAsyncAxiosInstance()
 
       if (axiosInstance) {
-        _request = responseDecorator(axiosInstance, requestOpts)
+        _request = getRequestProxy(axiosInstance, requestOpts)
       } else {
         asyncAxiosInstance && asyncAxiosInstance.then((axiosInstance) => {
-          _request = responseDecorator(axiosInstance, requestOpts)
+          _request = getRequestProxy(axiosInstance, requestOpts)
         })
       }
 
@@ -207,7 +210,7 @@ function createAxiosService (instance, options) {
         const request = getRequest(requestOpts)
         return fn(url, request, ...args)
       }
-    
+
     // merge tranform
     const mergeTransform = (transforms = [], fn) => {
       const defaults = options ? options.defaults : service.$http.defaults

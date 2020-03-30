@@ -225,17 +225,13 @@ const mockGetInfo = mockDecorator((...args) => {
 })
 
 // 包裹函数的写法
-export const getInfoWithMock = mockGetInfo(get('api/getInfo', null, {
-  autoLoading: false
-}))
+export const getInfoWithMock = mockGetInfo(get('api/getInfo')
 
 
 // 类装饰器的写法
 class Apis {
   @mockGetInfo
-  getInfoWithMock = get('api/getInfo', null, {
-    autoLoading: false
-  })
+  getInfoWithMock = get('api/getInfo')
 }
 
 export default new Apis()
@@ -372,7 +368,6 @@ const customService = axiosService.create(instance, {
     withCredentials: true
   },
   requestDefaults: {
-    autoLoading: true,
     // server端请求msg
     msgKey: 'message',
     // server端数据的key
@@ -394,7 +389,7 @@ const { getRequestsByRoot } = customService
 const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
 export const axiosServiceCreateGetInfo = get('api/getCode1Info', null, {
-  autoLoading: false
+  xxx
 })
 
 ```

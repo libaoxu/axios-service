@@ -7,7 +7,6 @@ const customService = axiosService.create(instance, {
     withCredentials: true
   },
   requestDefaults: {
-    autoLoading: true,
     // server端请求msg
     msgKey: 'message',
     // server端数据的key
@@ -30,6 +29,4 @@ instance.interceptors.request.use(function (e) {
 const { getRequestsByRoot } = customService
 const { get, post, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-export const axiosServiceCreateGetInfo = get('api/getCode1Info', null, {
-  autoLoading: false
-})
+export const axiosServiceCreateGetInfo = get('api/getCode1Info')
