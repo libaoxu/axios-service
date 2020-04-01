@@ -1253,8 +1253,8 @@ function createAxiosService(instance, options) {
     instance: instance
   }, options));
 
-  var getRequestProxy = function getRequestProxy(instance, requestOpts) {
-    var _service$requestDefau = _extends({}, service.requestDefaults, requestOpts),
+  var getRequestProxy = function getRequestProxy(instance, responseKeys) {
+    var _service$requestDefau = _extends({}, service.requestDefaults, responseKeys),
         msgKey = _service$requestDefau.msgKey,
         codeKey = _service$requestDefau.codeKey,
         dataKey = _service$requestDefau.dataKey,
@@ -1382,16 +1382,16 @@ function createAxiosService(instance, options) {
         getAxiosInstance = _handleAxiosInstances.getAxiosInstance,
         getAsyncAxiosInstance = _handleAxiosInstances.getAsyncAxiosInstance;
 
-    var getRequest = function getRequest(requestOpts) {
+    var getRequest = function getRequest(responseKeys) {
       var _request = void 0;
       var axiosInstance = getAxiosInstance();
       var asyncAxiosInstance = getAsyncAxiosInstance();
 
       if (axiosInstance) {
-        _request = getRequestProxy(axiosInstance, requestOpts);
+        _request = getRequestProxy(axiosInstance, responseKeys);
       } else {
         asyncAxiosInstance && asyncAxiosInstance.then(function (axiosInstance) {
-          _request = getRequestProxy(axiosInstance, requestOpts);
+          _request = getRequestProxy(axiosInstance, responseKeys);
         });
       }
 
@@ -1411,12 +1411,12 @@ function createAxiosService(instance, options) {
     };
 
     var requestConnect = function requestConnect(fn) {
-      return function (url, requestOpts) {
+      return function (url, responseKeys) {
         for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
           args[_key2 - 2] = arguments[_key2];
         }
 
-        var request = getRequest(requestOpts);
+        var request = getRequest(responseKeys);
         return fn.apply(undefined, [url, request].concat(args));
       };
     };
@@ -1577,7 +1577,7 @@ exports.default = createAxiosService;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.version = exports.serviceHocs = exports.mockDecorator = exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
+exports.version = exports.serviceHocs = exports.mockDecorate = exports.getMockDecorateByEnv = exports.getMessageDecorate = exports.mockDecorator = exports.getMockDecoratorByEnv = exports.getMessageDecorator = exports.createAxiosService = exports.getRequestsByRoot = exports.axiosService = undefined;
 
 var _create = __webpack_require__(/*! ./create */ "./src/create.js");
 
@@ -1593,12 +1593,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var getMessageDecorator = serviceHocs.getMessageDecorator,
     getMockDecoratorByEnv = serviceHocs.getMockDecoratorByEnv,
-    mockDecorator = serviceHocs.mockDecorator;
+    mockDecorator = serviceHocs.mockDecorator,
+    getMockDecorateByEnv = serviceHocs.getMockDecorateByEnv,
+    getMessageDecorate = serviceHocs.getMessageDecorate,
+    mockDecorate = serviceHocs.mockDecorate;
 
 
 var axiosService = (0, _create2.default)();
 var getRequestsByRoot = axiosService.getRequestsByRoot;
-var version = "1.4.0";
+var version = "1.4.1";
 
 exports.axiosService = axiosService;
 exports.getRequestsByRoot = getRequestsByRoot;
@@ -1606,6 +1609,9 @@ exports.createAxiosService = _create2.default;
 exports.getMessageDecorator = getMessageDecorator;
 exports.getMockDecoratorByEnv = getMockDecoratorByEnv;
 exports.mockDecorator = mockDecorator;
+exports.getMessageDecorate = getMessageDecorate;
+exports.getMockDecorateByEnv = getMockDecorateByEnv;
+exports.mockDecorate = mockDecorate;
 exports.serviceHocs = serviceHocs;
 exports.version = version;
 
@@ -1657,7 +1663,7 @@ var HEAD = exports.HEAD = 'head';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.delayDecorate = exports.getDelayDecorate = exports.setDataDecorate = exports.setParamsDecorate = exports.setCustomDataWrapper = exports.setCustomParamsWrapper = exports.requestOptsWrapper = exports.getErrorMsg = exports.getMessageDecorator = exports.mockDecorator = undefined;
+exports.delayDecorate = exports.getDelayDecorate = exports.setDataDecorate = exports.setParamsDecorate = exports.setCustomDataWrapper = exports.setCustomParamsWrapper = exports.requestOptsWrapper = exports.getErrorMsg = exports.getMessageDecorate = exports.getMessageDecorator = exports.mockDecorate = exports.mockDecorator = exports.getMockDecorateByEnv = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -1674,7 +1680,7 @@ var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function getMockDecoratorByEnv(isDev) {
-  return function mockDecorator(mockFn) {
+  return function mockDecorate(mockFn) {
     return (0, _createDecorator2.default)(function (apiFn) {
       return function () {
         if (isDev) {
@@ -1687,7 +1693,11 @@ function getMockDecoratorByEnv(isDev) {
   };
 }
 
+var getMockDecorateByEnv = exports.getMockDecorateByEnv = getMockDecoratorByEnv;
+
 var mockDecorator = exports.mockDecorator = getMockDecoratorByEnv("development" === 'development');
+
+var mockDecorate = exports.mockDecorate = mockDecorator;
 
 var getMessageDecorator = exports.getMessageDecorator = function getMessageDecorator(toast) {
   return function () {
@@ -1724,6 +1734,8 @@ var getMessageDecorator = exports.getMessageDecorator = function getMessageDecor
     });
   };
 };
+
+var getMessageDecorate = exports.getMessageDecorate = getMessageDecorator;
 
 var getErrorMsg = exports.getErrorMsg = function getErrorMsg() {
   var msg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -1781,9 +1793,9 @@ var requestToSetData = function requestToSetData(request, customData) {
 
 var decoratorsReadmeUrl = 'https://github.com/libaoxu/axios-service#%E6%9B%B4%E5%A4%9A%E8%A3%85%E9%A5%B0%E5%99%A8';
 
-var setCustomParamsWrapper = exports.setCustomParamsWrapper = (0, _utils.compose)((0, _utils.deprecatedHoc)('setCustomParamsWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetParams);
+var setCustomParamsWrapper = exports.setCustomParamsWrapper = (0, _utils.compose)((0, _utils.deprecateWrapper)('setCustomParamsWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetParams);
 
-var setCustomDataWrapper = exports.setCustomDataWrapper = (0, _utils.compose)((0, _utils.deprecatedHoc)('setCustomDataWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetData);
+var setCustomDataWrapper = exports.setCustomDataWrapper = (0, _utils.compose)((0, _utils.deprecateWrapper)('setCustomDataWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetData);
 
 var setParamsDecorate = exports.setParamsDecorate = function setParamsDecorate(customParams) {
   return (0, _createDecorator2.default)(function (fn) {
@@ -2110,7 +2122,7 @@ var compose = exports.compose = function compose() {
   });
 };
 
-var deprecatedHoc = exports.deprecatedHoc = function deprecatedHoc(fnName) {
+var deprecateWrapper = exports.deprecateWrapper = function deprecateWrapper(fnName) {
   var readmeUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://github.com/libaoxu/axios-service';
   return function (fn) {
     return function () {
