@@ -1657,7 +1657,7 @@ var HEAD = exports.HEAD = 'head';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.delayDecorator = exports.getDelayDecorator = exports.setDataDecorator = exports.setParamsDecorator = exports.setCustomDataWrapper = exports.setCustomParamsWrapper = exports.requestOptsWrapper = exports.getErrorMsg = exports.getMessageDecorator = exports.mockDecorator = undefined;
+exports.delayDecorate = exports.getDelayDecorate = exports.setDataDecorate = exports.setParamsDecorate = exports.setCustomDataWrapper = exports.setCustomParamsWrapper = exports.requestOptsWrapper = exports.getErrorMsg = exports.getMessageDecorator = exports.mockDecorator = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -1785,19 +1785,19 @@ var setCustomParamsWrapper = exports.setCustomParamsWrapper = (0, _utils.compose
 
 var setCustomDataWrapper = exports.setCustomDataWrapper = (0, _utils.compose)((0, _utils.deprecatedHoc)('setCustomDataWrapper', decoratorsReadmeUrl), requestConnector)(requestToSetData);
 
-var setParamsDecorator = exports.setParamsDecorator = function setParamsDecorator(customParams) {
+var setParamsDecorate = exports.setParamsDecorate = function setParamsDecorate(customParams) {
   return (0, _createDecorator2.default)(function (fn) {
     return requestToSetParams(fn, customParams);
   });
 };
 
-var setDataDecorator = exports.setDataDecorator = function setDataDecorator(customData) {
+var setDataDecorate = exports.setDataDecorate = function setDataDecorate(customData) {
   return (0, _createDecorator2.default)(function (fn) {
     return requestToSetData(fn, customData);
   });
 };
 
-var getDelayDecorator = exports.getDelayDecorator = function getDelayDecorator(isDev) {
+var getDelayDecorate = exports.getDelayDecorate = function getDelayDecorate(isDev) {
   return function (wait) {
     return (0, _createDecorator2.default)(function (fn) {
       return function () {
@@ -1819,7 +1819,7 @@ var getDelayDecorator = exports.getDelayDecorator = function getDelayDecorator(i
   };
 };
 
-var delayDecorator = exports.delayDecorator = getDelayDecorator("development" === 'development');
+var delayDecorate = exports.delayDecorate = getDelayDecorate("development" === 'development');
 
 /***/ }),
 

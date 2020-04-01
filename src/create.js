@@ -22,12 +22,12 @@ function createAxiosService (instance, options) {
   /**
    * axios实例的装饰器, 主要做响应拦截
    * @param {Axios} instance axios实例
-   * @param {Object} requestOpts axiosService请求配置项, 包含状态检测等, 详见config.requestDefaults
+   * @param {Object} responseKeys axios响应data的配置项, 包含状态检测等, 详见config.requestDefaults
    */
-  const getRequestProxy = function getRequestProxy (instance, requestOpts) {
+  const getRequestProxy = function getRequestProxy (instance, responseKeys) {
     const { msgKey, codeKey, dataKey, successCode } = {
       ...service.requestDefaults,
-      ...requestOpts,
+      ...responseKeys,
     }
 
     /**
@@ -168,23 +168,23 @@ function createAxiosService (instance, options) {
     const { getAxiosInstance, getAsyncAxiosInstance } = handleAxiosInstances(baseConfigs)
 
     /**
-     * 第二步 根据每个不同请求配置的requestOpts获取具体request请求的包装器
-     * @param {Object} requestOpts 请求配置项对象
+     * 第二步 根据每个不同请求配置的responseKeys获取具体request请求的包装器
+     * @param {Object} responseKeys 响应配置项对象
      * @property {String} opts.msgKey server端请求msg
      * @property {String} opts.dataKey server端数据的key
      * @property {String} opts.codeKey server端请求状态的key
      * @property {Number} opts.successCode server端请求成功的状态, 注意: 是服务端返回的状态码, 不是xhr在浏览器端的返回状态
      */
-    const getRequest = function getRequest (requestOpts) {
+    const getRequest = function getRequest (responseKeys) {
       let _request
       const axiosInstance = getAxiosInstance()
       const asyncAxiosInstance = getAsyncAxiosInstance()
 
       if (axiosInstance) {
-        _request = getRequestProxy(axiosInstance, requestOpts)
+        _request = getRequestProxy(axiosInstance, responseKeys)
       } else {
         asyncAxiosInstance && asyncAxiosInstance.then((axiosInstance) => {
-          _request = getRequestProxy(axiosInstance, requestOpts)
+          _request = getRequestProxy(axiosInstance, responseKeys)
         })
       }
 
@@ -197,17 +197,17 @@ function createAxiosService (instance, options) {
       }
     }
 
-    // 具体请求的装饰器, requestOpts => request, 将外层的配置参数进行预处理, 保证requestProxy只直接收axios的config
+    // 具体请求的装饰器, responseKeys => request, 将外层的配置参数进行预处理, 保证requestProxy只直接收axios的config
     const requestConnect = fn =>
       /**
        *
        * @param {String} url 请求的url后缀
-       * @param {Object} requestOpts 请求的配置项, 详见config.js中的requestDefaults
+       * @param {Object} responseKeys 响应的配置项, 详见config.js中的requestDefaults
        * @param {Object} moreConfigs 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
        * @return {Function} fn执行结果
        */
-      (url, requestOpts, ...args) => {
-        const request = getRequest(requestOpts)
+      (url, responseKeys, ...args) => {
+        const request = getRequest(responseKeys)
         return fn(url, request, ...args)
       }
 
@@ -298,7 +298,7 @@ function createAxiosService (instance, options) {
        * resFul用的get请求
        *
        * @param {String} restFulUrl 请求的url, 且与上面的url配置有区别, 详见readme.md
-       * @param {Object} requestOpts 请求配置项
+       * @param {Object} responseKeys 请求配置项
        * @returns {Function} 具体请求的函数
        */
       restFulGet: requestConnect(function axiosServiceRestFulGet (restFulUrl, request, moreConfigs) {

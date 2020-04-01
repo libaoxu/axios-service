@@ -223,7 +223,7 @@ export const compose = (...funcs) => {
   return funcs.reduce((a, b) => (...args) => a(b(...args)))
 }
 
-export const deprecatedHoc = (fnName, readmeUrl = 'https://github.com/libaoxu/axios-service') => fn => (...args) => {
+export const deprecateWrapper = (fnName, readmeUrl = 'https://github.com/libaoxu/axios-service') => fn => (...args) => {
   logger.warn(`🚫${fnName || fn.name}已经废弃, 更多用法请参考: ${readmeUrl}`)
   return fn(...args)
 }

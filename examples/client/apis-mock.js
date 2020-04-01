@@ -1,10 +1,10 @@
 
-import { getMockDecoratorByEnv, mockDecorator } from 'axios-service'
+import { getMockDecorateByEnv, mockDecorate } from 'axios-service'
 
 // const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
 // const mockDecorator = getMockDecoratorByEnv(false)
 
-export const mockGetInfo = mockDecorator((...args) => {
+export const mockGetInfo = mockDecorate((...args) => {
   // 这样可以在production构建阶段, 剔除掉if内部的mock代码, 减少线上包体积, 下面代码构建结果如下: if(false) { var mockjs; }
   if (process.env.NODE_ENV === 'development') {
     return Promise.resolve({
@@ -21,7 +21,7 @@ export const mockGetInfo = mockDecorator((...args) => {
   }
 })
 
-export const mockSuccess = mockDecorator((...args) => {
+export const mockSuccess = mockDecorate((...args) => {
   if (process.env.NODE_ENV === 'development') {
     return Promise.resolve({
       'code': 0,
@@ -31,7 +31,7 @@ export const mockSuccess = mockDecorator((...args) => {
   }
 })
 
-export const mockFail = mockDecorator((...args) => {
+export const mockFail = mockDecorate((...args) => {
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line prefer-promise-reject-errors
     return Promise.reject({

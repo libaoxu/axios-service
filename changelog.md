@@ -1,8 +1,15 @@
+### 1.4.1
+*2020-4-1*
+
+### Changed
+ * `xxxDecorator`名字改为`xxxDecorate`, 表示需要执行一次来创建真正的装饰器, 区别为: `@decorator` 和 `@decorate(xxx)`
+ * `requestOpts` 替换为 `responseKeys`
+
 ### 1.4.0
 *2020-03-30*
 ### Added
   * pkg引入[create-decorator](https://github.com/inkefe/create-decorator), 修改`service-decorators`中各种装饰器底层逻辑, 如[service-decorators.js](./src/service-decorators.js)
-  * 引入最新的`setDataDecorator`、`setParamsDecorator`、`delayDecorator`等装饰器, 扩展`apis`装饰器功能, 详见[apis-request-decorators](./examples/client/apis-request-decorators.js)
+  * 引入最新的`setDataDecorate`、`setParamsDecorate`、`delayDecorate`等装饰器, 扩展`apis`装饰器功能, 详见[apis-request-decorators](./examples/client/apis-request-decorators.js)
   * 将`setCustomDataWrapper`和`setCustomParamsWrapper`标志为废弃的api, 避免高阶函数与装饰器想混淆, 后面统一用装饰器思想来抽象配置化逻辑
 
 ### Changed

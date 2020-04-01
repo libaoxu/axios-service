@@ -1,7 +1,7 @@
 import { getRequestsByRoot, serviceHocs, version } from 'axios-service'
 import { compose } from 'redux'
 import { mockGetInfo, mockSuccess, mockFail } from './apis-mock'
-import { messageDecorator, requestFailErrMsg } from './service-hocs';
+import { messageDecorate, requestFailErrMsg } from './service-hocs';
 
 // 本库并不强依赖redux, 其他具有compose功能的库都可以用, 如: ramda
 // const { compose } = require('ramda')
@@ -53,7 +53,7 @@ class Apis {
   /**
    * mockSuccess 和 mockFail之间可自由切换
    */
-  @messageDecorator({ successMsg: '获取信息成功', errorMsg: (error) => (error && error.message) || '获取信息失败' })
+  @messageDecorate({ successMsg: '获取信息成功', errorMsg: (error) => (error && error.message) || '获取信息失败' })
   @mockSuccess
   // @mockFail
   getInfoWithMesageDecorator = get('api/getInfo')
@@ -62,7 +62,7 @@ class Apis {
    * 函数式写法mockFail
    */
   getInfoFailWithDecorators = compose(
-    messageDecorator({ successMsg: '获取信息成功', errorMsg: requestFailErrMsg }),
+    messageDecorate({ successMsg: '获取信息成功', errorMsg: requestFailErrMsg }),
     mockFail
   )(get('api/getInfo'))
 }

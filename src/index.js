@@ -6,7 +6,7 @@
 import createAxiosService from './create'
 import * as serviceHocs from './service-decorators'
 
-const { getMessageDecorator, getMockDecoratorByEnv, mockDecorator } = serviceHocs
+const { getMessageDecorator, getMockDecoratorByEnv, mockDecorator, getMockDecorateByEnv, getMessageDecorate, mockDecorate } = serviceHocs
 
 const axiosService = createAxiosService()
 const getRequestsByRoot = axiosService.getRequestsByRoot
@@ -19,6 +19,9 @@ export {
   getMessageDecorator,
   getMockDecoratorByEnv,
   mockDecorator,
+  getMessageDecorate,
+  getMockDecorateByEnv,
+  mockDecorate,
   serviceHocs,
   version
 }

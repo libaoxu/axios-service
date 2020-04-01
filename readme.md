@@ -323,21 +323,21 @@ api.getInfo()
 
 ## 更多装饰器
 
-> 主要包含[*setDataDecorator*](./src/service-decorators.js#L211)、[*setParamsDecorator*](./src/service-decorators.js#L200)、[*delayDecorator*](./src/service-decorators.js#L246)等装饰器, 下面是具体用法:
+> 主要包含[*setDataDecorate*](./src/service-decorators.js#L211)、[*setParamsDecorate*](./src/service-decorators.js#L200)、[*delayDecorate*](./src/service-decorators.js#L246)等装饰器, 下面是具体用法:
 
-其中`setDataDecorator`代替原`setCustomDataWrapper`高阶函数用法, `setParamsDecorator`代替原`setCustomParamsWrapper`高阶函数用法
+其中`setDataDecorate`代替原`setCustomDataWrapper`高阶函数用法, `setParamsDecorate`代替原`setCustomParamsWrapper`高阶函数用法
 
-其中`delayDecorator`这里是直接给web端用的, 内置production保护机制, 如果是rn端和小程序端, 请参考中[`getDelayDecorator`](./src/service-decorators.js#L222)用法
+其中`delayDecorate`这里是直接给web端用的, 内置production保护机制, 如果是rn端和小程序端, 请参考中[`getDelayDecorate`](./src/service-decorators.js#L222)用法
 
 ```js
 import { serviceHocs, getRequestsByRoot } from 'axios-service'
 import { messageDecorator, requestFailErrMsg } from './service-hocs'
 import { mockGetInfo } from './apis-mock'
 
-const { requestOptsWrapper, setDataDecorator, setParamsDecorator, delayDecorator } = serviceHocs
+const { requestOptsWrapper, setDataDecorate, setParamsDecorate, delayDecorate } = serviceHocs
 const { get: baseGet, post: basePost } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-const requestOpts = {
+const responseKeys = {
   msgKey: 'msg_custom',
   codeKey: 'code_custom',
   successCode: 0
@@ -347,9 +347,9 @@ const customData = { name: 'libx', birth: '1996' }
 
 const customParams = { uid: 123, sid: 456 }
 
-const get = requestOptsWrapper(baseGet, requestOpts)
+const get = requestOptsWrapper(baseGet, responseKeys)
 
-const post = requestOptsWrapper(basePost, requestOpts)
+const post = requestOptsWrapper(basePost, responseKeys)
 
 class Apis {
   getInfoCustom = get('/api/getInfoCustom')
@@ -357,23 +357,23 @@ class Apis {
   postInfoCustom = post('/api/postInfoCustom')
 
   // 将customParams 固定到请求的query string中
-  @setParamsDecorator(customParams)
+  @setParamsDecorate(customParams)
   getInfoWithParamsDecorator = get('/api/getInfoCustom')
 
   // 将customData 固定到请求的body体中
-  @setDataDecorator(customData)
+  @setDataDecorate(customData)
   getInfoWithDataDecorator = post('/api/getInfoCustom')
 
-  @setParamsDecorator(customParams)
-  @setDataDecorator(customData)
+  @setParamsDecorate(customParams)
+  @setDataDecorate(customData)
   getInfoWithParamsAndDataDecorator = post('/api/getInfoCustom')
 
   @messageDecorator({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
   @mockGetInfo
-  // 延时3s, 注意: 这里是web端, 内置production保护机制, 如果是rn端和小程序端, 请参考中`getDelayDecorator`用法
-  @delayDecorator(3000)
-  @setParamsDecorator(customParams)
-  @setDataDecorator(customData)
+  // 延时3s, 注意: 这里是web端, 内置production保护机制, 如果是rn端和小程序端, 请参考中`getDelayDecorate`用法
+  @delayDecorate(3000)
+  @setParamsDecorate(customParams)
+  @setDataDecorate(customData)
   getInfoWithMoreDecorators = post('/api/getInfoCustom')
 }
 
@@ -393,21 +393,21 @@ import { compose } from 'redux'
 const { requestOptsWrapper } = serviceHocs
 const { get: baseGet, post: basePost, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-const requestOpts = {
+const responseKeys = {
   msgKey: 'msg_custom',
   codeKey: 'code_custom',
   successCode: 0
 }
 
-const get = requestOptsWrapper(baseGet, requestOpts)
+const get = requestOptsWrapper(baseGet, responseKeys)
 
-const post = requestOptsWrapper(basePost, requestOpts)
+const post = requestOptsWrapper(basePost, responseKeys)
 
 /**
  * before:
- * export const getInfoCustom1 = get('/api/getInfoCustom1', requestOpts)
- * export const getInfoCustom2 = get('/api/getInfoCustom2', requestOpts)
- * export const getInfoCustom3 = get('/api/getInfoCustom3', requestOpts)
+ * export const getInfoCustom1 = get('/api/getInfoCustom1', responseKeys)
+ * export const getInfoCustom2 = get('/api/getInfoCustom2', responseKeys)
+ * export const getInfoCustom3 = get('/api/getInfoCustom3', responseKeys)
  * after:
  * 将每次都传入的requestOpts给柯里化起来
  */
@@ -432,7 +432,7 @@ import { compose } from 'redux'
 const { requestOptsWrapper, setCustomDataWrapper, setCustomParamsWrapper } = serviceHocs
 const { get: baseGet, post: basePost, postXForm } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-const requestOpts = {
+const responseKeys = {
   msgKey: 'error_msg',
   codeKey: 'dm_error',
   successCode: 0
@@ -442,20 +442,20 @@ const customData = { name: 'libx', birth: '1996' }
 
 const customParams = { uid: 123, sid: 456 }
 
-const get = requestOptsWrapper(baseGet, requestOpts)
+const get = requestOptsWrapper(baseGet, responseKeys)
 
-const post = requestOptsWrapper(basePost, requestOpts)
+const post = requestOptsWrapper(basePost, responseKeys)
 
 // basic
 const composeGet = compose(
   fn => setCustomDataWrapper(fn, customData),
-  fn => requestOptsWrapper(fn, requestOpts),
+  fn => requestOptsWrapper(fn, responseKeys),
 )(baseGet)
 
 // or
 const requestHoc = compose(
   fn => setCustomDataWrapper(fn, customData),
-  fn => requestOptsWrapper(fn, requestOpts),
+  fn => requestOptsWrapper(fn, responseKeys),
   fn => setCustomParamsWrapper(fn, customParams),
 )
 

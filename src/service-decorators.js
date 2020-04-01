@@ -4,7 +4,7 @@
  * TODO: 需要使用createDecorator来重写
  */
 import createDecorator from '@inkefe/create-decorator'
-import { deprecatedHoc, compose } from './utils'
+import { deprecateWrapper, compose } from './utils'
 
 /**
  * 通过环境变量获取mock装饰器
@@ -18,7 +18,7 @@ export function getMockDecoratorByEnv (isDev) {
    * @param {Function} mockFn mock的函数逻辑
    * @return {Function}
    */
-  return function mockDecorator (mockFn) {
+  return function mockDecorate (mockFn) {
     return createDecorator(apiFn => (...args) => {
       // 开发环境走mock, 如果需要关闭, 需要再apis种删除
       if (isDev) {
@@ -30,6 +30,9 @@ export function getMockDecoratorByEnv (isDev) {
   }
 }
 
+// 名词改为动词, 表示需要创建一下才能生成 decorator
+export const getMockDecorateByEnv = getMockDecoratorByEnv
+
 /**
  * mock装饰器
  *
@@ -39,6 +42,11 @@ export function getMockDecoratorByEnv (isDev) {
  * @return {Function}
  */
 export const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')
+
+/**
+ * 名词改为动词, 表示需要创建一下才能生成 decorator
+ */
+export const mockDecorate = mockDecorator
 
 /**
  * 消息提示装饰器, 依赖于外层toast对象, 提供toast.success 和 toast.error两个函数
@@ -76,6 +84,9 @@ export const getMessageDecorator = toast =>
       })
     })
   }
+
+// 名词改为动词, 表示获取到的是decorate 需要创建一下才能生成 decorator
+export const getMessageDecorate = getMessageDecorator
 
 /**
  * errorMsg 消息高阶函数, 针对绝大多数 error
@@ -171,7 +182,7 @@ const decoratorsReadmeUrl = 'https://github.com/libaoxu/axios-service#%E6%9B%B4%
  * }
  */
 export const setCustomParamsWrapper = compose(
-  deprecatedHoc('setCustomParamsWrapper', decoratorsReadmeUrl),
+  deprecateWrapper('setCustomParamsWrapper', decoratorsReadmeUrl),
   requestConnector
 )(requestToSetParams)
 
@@ -193,7 +204,7 @@ export const setCustomParamsWrapper = compose(
  * }
  */
 export const setCustomDataWrapper = compose(
-  deprecatedHoc('setCustomDataWrapper', decoratorsReadmeUrl),
+  deprecateWrapper('setCustomDataWrapper', decoratorsReadmeUrl),
   requestConnector
 )(requestToSetData)
 
@@ -202,34 +213,34 @@ export const setCustomDataWrapper = compose(
  * @param {Object} customParams 需要在request时注入到queryString中的数据
  * @example
  * class Apis {
- *   @setParamsDecorator({ uid, sid })
+ *   @setParamsDecorate({ uid, sid })
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setParamsDecorator = customParams => createDecorator((fn) => requestToSetParams(fn, customParams))
+export const setParamsDecorate = customParams => createDecorator((fn) => requestToSetParams(fn, customParams))
 
 /**
  * 装饰器目的为: 可以将固定数据注入请求的数据中, post(将数据固定到body体中), get请求(将数据固定到query string中)
  * @param {Object} customData 需要在request时注入到body体中的数据
  * @example
  * class Apis {
- *   @setDataDecorator({ uid, sid })
+ *   @setDataDecorate({ uid, sid })
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setDataDecorator = customData => createDecorator((fn) => requestToSetData(fn, customData))
+export const setDataDecorate = customData => createDecorator((fn) => requestToSetData(fn, customData))
 
 /**
  * 根据环境变量获取延时装饰器, 做一个保护机制, 以防production环境也延时, 引起线上bug
  * @param {Boolean} isDev 是否为开发环境
  * web端:
- * const delayDecorator = getDelayDecorator(process.env.NODE_ENV === 'development')
+ * const delayDecorate = getDelayDecorate(process.env.NODE_ENV === 'development')
  * RN端:
- * const delayDecorator = getDelayDecorator(__DEV__)
+ * const delayDecorate = getDelayDecorate(__DEV__)
  * 小程序端:
- * const delayDecorator = getDelayDecorator(环境变量名 === dev环境变量值)
+ * const delayDecorate = getDelayDecorate(环境变量名 === dev环境变量值)
  */
-export const getDelayDecorator = isDev => {
+export const getDelayDecorate = isDev => {
   return (wait) => createDecorator(fn => (...args) => {
     if (isDev) {
       return new Promise(resolve => {
@@ -244,11 +255,11 @@ export const getDelayDecorator = isDev => {
 }
 
 /**
- * 延时装饰器, 已经根据环境变量区分, 适用于web端项目, 小程序和rn端应该使用上面`getDelayDecorator`来创建新的延时装饰器
+ * 延时装饰器, 已经根据环境变量区分, 适用于web端项目, 小程序和rn端应该使用上面`getDelayDecorate`来创建新的延时装饰器
  * class A {
  *  // 延时3s请求
- *  @delayDecorator(3000)
+ *  @delayDecorate(3000)
  *  getUserInfo = get('/user/info')
  * }
  */
-export const delayDecorator = getDelayDecorator(process.env.NODE_ENV === 'development')
+export const delayDecorate = getDelayDecorate(process.env.NODE_ENV === 'development')

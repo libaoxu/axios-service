@@ -1,13 +1,13 @@
 import { serviceHocs, getRequestsByRoot, getMockDecoratorByEnv } from 'axios-service'
-import { messageDecorator, requestFailErrMsg } from './service-hocs'
+import { messageDecorate, requestFailErrMsg } from './service-hocs'
 import { mockGetInfo } from './apis-mock'
 
-const { requestOptsWrapper, setDataDecorator, setParamsDecorator, delayDecorator } = serviceHocs
+const { requestOptsWrapper, setDataDecorate, setParamsDecorate, delayDecorate } = serviceHocs
 const { get: baseGet, post: basePost } = getRequestsByRoot({ root: 'http://127.0.0.1:3801/' })
 
-const prodMockDecorator = getMockDecoratorByEnv(false)
+const prodMockDecorate = getMockDecoratorByEnv(false)
 
-const requestOpts = {
+const responseKeys = {
   msgKey: 'error_msg',
   codeKey: 'dm_error',
   successCode: 0
@@ -17,9 +17,9 @@ const customData = { name: 'libx', birth: '1996' }
 
 const customParams = { uid: 123, sid: 456 }
 
-const get = requestOptsWrapper(baseGet, requestOpts)
+const get = requestOptsWrapper(baseGet, responseKeys)
 
-const post = requestOptsWrapper(basePost, requestOpts)
+const post = requestOptsWrapper(basePost, responseKeys)
 
 class Apis {
   getInfoCustom = get('/api/getInfoCustom')
@@ -27,23 +27,23 @@ class Apis {
   postInfoCustom = post('/api/postInfoCustom')
 
   // 将customParams 固定到请求的query string中
-  @setParamsDecorator(customParams)
+  @setParamsDecorate(customParams)
   getInfoWithParamsDecorator = get('/api/getInfoCustom')
 
   // 将customData 固定到请求的body体中
-  @setDataDecorator(customData)
+  @setDataDecorate(customData)
   getInfoWithDataDecorator = post('/api/getInfoCustom')
 
-  @setParamsDecorator(customParams)
-  @setDataDecorator(customData)
+  @setParamsDecorate(customParams)
+  @setDataDecorate(customData)
   getInfoWithParamsAndDataDecorator = post('/api/getInfoCustom')
 
-  @messageDecorator({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
-  @prodMockDecorator(() => {})
-  @delayDecorator(3000)
+  @messageDecorate({ successMsg: '混合装饰器请求成功', errorMsg: requestFailErrMsg })
+  @prodMockDecorate(() => {})
+  @delayDecorate(3000)
   @mockGetInfo
-  @setParamsDecorator(customParams)
-  @setDataDecorator(customData)
+  @setParamsDecorate(customParams)
+  @setDataDecorate(customData)
   getInfoWithMoreDecorators = post('/api/getInfoCustom')
 }
 
