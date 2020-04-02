@@ -4,10 +4,10 @@ node_js: stable
 before_install:
 
 after_success:
-install: 
-- npm i
+install:
+- yarn install
 
 script:
-- npm run build
+- yarn run lint && yarn run build
 
 after_script:
