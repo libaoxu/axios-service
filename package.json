@@ -17,7 +17,7 @@
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
-    "prepublish": "git pull && git pull origin master",
+    "prepublishOnly": "git pull && git pull origin master",
     "publish": "npm run build && git push origin && git push origin --tags && npm publish --access public",
     "publish:patch": "npm run lint && npm run version:patch && npm run publish",
     "publish:minor": "npm run lint && npm run version:minor && npm run publish",
