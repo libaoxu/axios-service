@@ -67,7 +67,6 @@
     "eslint-plugin-import": "^2.14.0",
     "file-loader": "^4.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "ik-release": "git+ssh://git@code.inke.cn:opd/fe-aws/modules/ik-release.git",
     "redux": "^4.0.5",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.3.11",
