@@ -10,7 +10,7 @@ module.exports = merge(baseConfig, {
   mode: isProd ? 'production' : 'development',
   output: {
     filename,
-    path: path.resolve('./lib'),
+    path: path.resolve('./dist'),
     library: 'base-module-template',
     libraryTarget: 'umd'
   },
