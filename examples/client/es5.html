@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>axios-example-es5</title>
+</head>
+<body>
+
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+<script src="../dist/axios-service.js"></script>
+<script>
+var service = axiosService.service
+var getRequestsByRoot = axiosService.getRequestsByRoot
+
+service.init(axios, {
+  defaults: {
+    withCredentials: true
+  },
+  requestDefaults: {
+    // server端请求msg
+    msgKey: 'msg',
+    // server端数据的key
+    dataKey: 'data',
+    // server端请求状态的key
+    codeKey: 'code',
+    // server端请求成功的状态, 注意: 是服务端返回的请求成功的状态码, 不是xhr在浏览器端的返回状态
+    successCode: 200
+  }
+})
+
+// 这里的url只是个demo, 需要根据实际场景修改为真实的url, 或者使用webpack的devServer做跨域代理
+// 如果跨域代理, root因为为 '/', 或者不填, 因为root的默认是也是 '/'
+// 注意: 这里的root是写死的demo, 实际项目可能应该根据具体环境不同, 请求不同url做不同处理
+var requestRoot = getRequestsByRoot({ root: 'http://www.demo.cn/' })
+var requestPeRoot = getRequestsByRoot({ root: 'http://b.demo.cn./' })
+
+var getInfo = requestRoot.get('api/getinfo')
+
+// 配置api可以足够灵活, 如果有需要对通用的axios的config做处理, 这里可以配置一个高阶函数
+var updateForm = function (params) {
+  return requestRoot.postXForm('api/updateform')(params, {
+    headers: {
+      ticket: 'ticket'
+    }
+  })
+}
+
+// 自定义key
+var getPeInfo = requestPeRoot.get('api/v2/user/login', {
+  msgKey: 'msg',
+  codeKey: 'status',
+})
+
+var getHost = requestPeRoot.restFulGet('api/v2/tree/tagstring/cop.inke/page_size/$page_size/page_index/$page_index/hosts', {
+  msgKey: 'msg',
+  codeKey: 'status',
+})
+
+
+// 普通get请求
+getInfo({ ticket: 'ticket' }, {
+  // 第二个参数是 axois的相关配置项, 可以放headers, params等
+  headers: {
+    ticket: 'ticket',
+  }
+})
+  .then(({ data }) => {
+    console.log('getInfo: ', data)
+  })
+
+// 普通get请求, 根路径不同
+getPeInfo({ ticket: 'ticket' })
+  .then(({ data }) => {
+    console.log('getPeInfo: ', data)
+  })
+
+// post请求, 还需要动态变化url的情况
+updateForm({ username: 'username', pwd: '123' }, {
+  params: {
+    ticket: 'ticket'
+  }
+})
+  .then(({ data }) => {
+    console.log('updateForm: ', data)
+  })
+
+// 第一个参数是urlData, 处理restFul url中的格式的
+// 第二个参数是具体的data
+// 第三个参数是axios的config
+getHost({
+  page_size: 20,
+  page_index: 1
+})
+  .then(({ data }) => {
+    console.log('getHost: ', data)
+  })
+</script>
+
+</body>
+</html>

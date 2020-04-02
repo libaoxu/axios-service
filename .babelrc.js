@@ -1,9 +1,12 @@
+const pkg = require('./package.json')
+const isBuildCommonjs = process.env.BABEL_ENV === "commonjs"
+
 module.exports = {
   "presets": [
     [
       "@babel/preset-env", {
         // commonjs时: 需要构建commonjs模块
-        "modules": process.env.BABEL_ENV === "commonjs" ? "commonjs" : false,
+        "modules": isBuildCommonjs ? "commonjs" : false,
         targets: {
           browsers: [
             'last 2 versions',
@@ -26,8 +29,15 @@ module.exports = {
     }],
     "@babel/plugin-transform-spread",
     "@babel/plugin-proposal-object-rest-spread",
+    ["@babel/plugin-proposal-decorators", {
+      "legacy": true
+    }],
     "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-export-default-from"
-  ],
+    "@babel/plugin-proposal-export-default-from",
+    // 构建commonjs时, 把版本好注入到js里, 作为固定好的变量
+    isBuildCommonjs && ["transform-define", {
+      "__VERSION__": pkg.version
+    }]
+  ].filter(Boolean),
   "exclude": "node_modules/**"
 }

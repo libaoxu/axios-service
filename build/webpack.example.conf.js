@@ -7,8 +7,7 @@ const baseConfig = require('./webpack.base.conf')
 module.exports = merge(baseConfig, {
   mode: 'development',
   entry: {
-    index: path.join(__dirname, '../examples/index.js'),
-    es5: path.join(__dirname, '../examples/es5.js'),
+    index: path.join(__dirname, '../examples/client/index.js'),
   },
   output: {
     filename: '[name].js',
@@ -30,26 +29,19 @@ module.exports = merge(baseConfig, {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, '../examples/index.html'),
+      template: path.join(__dirname, '../examples/client/index.html'),
       chunks: ['index'],
-      inject: true,
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'es5.html',
-      template: path.join(__dirname, '../examples/es5.html'),
-      chunks: ['es5'],
       inject: true,
     }),
   ],
   resolve: {
     alias: {
-      // 'ik-bridgex': path.resolve(__dirname, '../index.js'),
-      'base-module-template': path.resolve(__dirname, '../src'),
+      'axios-service': path.resolve(__dirname, '../src'),
     }
   },
   devServer: {
-    port: 3801,
-    host: '0.0.0.0',
+    port: 3800,
+    host: '127.0.0.1',
     inline: true,
     hot: true,
     proxy: {
