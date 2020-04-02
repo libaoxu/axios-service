@@ -1,5 +1,6 @@
 # 忽略目录
 lib/
+dist/
 tests/
 node_modules/
 

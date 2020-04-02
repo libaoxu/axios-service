@@ -6,6 +6,15 @@ const module = {
   version
 }
 
+class A {
+  getInfo (...args) {
+    console.log(...args)
+  }
+}
+
+Object.keys(module).some(v => v === 0)
+
+Object.assign({ ...module })
 
 export {
   version
