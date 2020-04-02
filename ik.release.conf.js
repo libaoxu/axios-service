@@ -7,7 +7,7 @@ module.exports = { // ik-release要读取的配置
   isNeedGitHandle: true, // 是否包含git操作 type: Boolean
   task: [
     { // 任务
-      source: 'lib', // 要copy的文件夹
+      source: 'dist', // 要copy的文件夹
       destinationFolder: `../static-resources/tpc/common/base-module-template@${version}`, // 目标文件夹
       destinationCwd: '../static-resources', // 目标仓库位置
       destinationBranch: 'master', // 要提交的分支
@@ -15,7 +15,7 @@ module.exports = { // ik-release要读取的配置
       filter: [/.js$/, /.js.map$/]
     },
     {
-      source: 'lib',
+      source: 'dist',
       destinationFolder: './_dist',
       destinationCwd: '',
       destinationBranch: 'master',
