@@ -29,7 +29,7 @@ const composePost = compose(
   fn => setCustomParamsWrapper(fn, customParams),
 )(post)
 
-export const getInfoCustom = get('/api/getInfoCustom')
+export const getInfoCustom = get('/api/getInfoCustom', { myLoveLeft: true })
 
 export const postInfoCustom = post('/api/postInfoCustom')
 
