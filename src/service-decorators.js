@@ -1,7 +1,6 @@
 /**
  * @file mock装饰器 和 消息装饰器都是工具函数, 与axios-service没有关联, 可装饰任何返回Promise的函数, 这些装饰器更多提供的只是一个装饰的思路, 开发者可自由扩展自定义装饰器, 如异步参数依赖, 单例, loading等等
  * @author libaoxu
- * TODO: 需要使用createDecorator来重写
  */
 import createDecorator from '@inkefe/create-decorator'
 import { deprecateWrapper, compose } from './utils'
@@ -23,9 +22,8 @@ export function getMockDecoratorByEnv (isDev) {
       // 开发环境走mock, 如果需要关闭, 需要再apis种删除
       if (isDev) {
         return mockFn(...args)
-      } else {
-        return apiFn(...args)
       }
+      return apiFn(...args)
     })
   }
 }
@@ -54,7 +52,7 @@ export const mockDecorate = mockDecorator
  * @param {Function} toast.success
  * @param {Function} toast.error
  */
-export const getMessageDecorator = toast =>
+export const getMessageDecorator = toast => {
   /**
    * 预制的消息内容
    *
@@ -62,28 +60,29 @@ export const getMessageDecorator = toast =>
    * @property {String|Function} successMsg: 成功的消息
    * @property {String|Function} errorMsg: 失败的消息
    */
-  ({ successMsg, errorMsg } = {}) => {
+  return ({ successMsg, errorMsg } = {}) => {
     // eslint-disable-next-line no-console
     const alert = typeof window !== 'undefined' ? window.alert : console.log
-    const getToast = name => (typeof toast === 'object' && typeof toast[name] === 'function') ? toast[name] : alert
-    const messageGetter = msg => (typeof msg === 'function') ? msg : _ => msg
+    const getToast = name => ((typeof toast === 'object' && typeof toast[name] === 'function') ? toast[name] : alert)
+    const messageGetter = msg => ((typeof msg === 'function') ? msg : _ => msg)
     const successToast = getToast('success')
     const errorToast = getToast('error')
     const getSuccessMsg = messageGetter(successMsg)
     const getErrorMsg = messageGetter(errorMsg)
 
     return createDecorator(fn => (...args) => {
-      return typeof fn === 'function' && fn(...args).then((res) => {
+      return typeof fn === 'function' && fn(...args).then(res => {
         const msg = getSuccessMsg(res)
         msg && successToast(msg)
         return Promise.resolve(res)
-      }, (err) => {
+      }, err => {
         const msg = getErrorMsg(err)
         msg && errorToast(msg)
         return Promise.reject(err)
       })
     })
   }
+}
 
 // 名词改为动词, 表示获取到的是decorate 需要创建一下才能生成 decorator
 export const getMessageDecorate = getMessageDecorator
@@ -217,7 +216,7 @@ export const setCustomDataWrapper = compose(
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setParamsDecorate = customParams => createDecorator((fn) => requestToSetParams(fn, customParams))
+export const setParamsDecorate = customParams => createDecorator(fn => requestToSetParams(fn, customParams))
 
 /**
  * 装饰器目的为: 可以将固定数据注入请求的数据中, post(将数据固定到body体中), get请求(将数据固定到query string中)
@@ -228,7 +227,7 @@ export const setParamsDecorate = customParams => createDecorator((fn) => request
  *   getUserInfo = get('/user/info')
  * }
  */
-export const setDataDecorate = customData => createDecorator((fn) => requestToSetData(fn, customData))
+export const setDataDecorate = customData => createDecorator(fn => requestToSetData(fn, customData))
 
 /**
  * 根据环境变量获取延时装饰器, 做一个保护机制, 以防production环境也延时, 引起线上bug
@@ -241,16 +240,15 @@ export const setDataDecorate = customData => createDecorator((fn) => requestToSe
  * const delayDecorate = getDelayDecorate(环境变量名 === dev环境变量值)
  */
 export const getDelayDecorate = isDev => {
-  return (wait) => createDecorator(fn => (...args) => {
+  return wait => createDecorator(fn => (...args) => {
     if (isDev) {
       return new Promise(resolve => {
         setTimeout(() => {
           resolve(fn(...args))
         }, wait || 0);
       })
-    } else {
-      return fn(...args)
     }
+    return fn(...args)
   })
 }
 

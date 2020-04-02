@@ -1,5 +1,0 @@
-{
-  "presets": ["stage-2", "es2015"],
-  "plugins": ["transform-decorators-legacy", "transform-class-properties"],
-  "comments": false
-}

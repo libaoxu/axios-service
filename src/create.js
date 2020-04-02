@@ -3,19 +3,19 @@
  * @author libaoxu
  * @date 2018-05-08
  */
+import qs from 'qs'
 import { GET, POST, PATCH, PUT, HEAD, DELETE, OPTIONS } from './request-types'
 import { formatRestFulUrl, extend, joinRootAndPath, logger, isObject } from './utils'
-import { STATUS_200, defaults, requestDefaults, UN_PRODUCTION, defaultBaseConfig } from './config'
+import { STATUS_200, defaults as axiosDefaults, requestDefaults, defaultBaseConfig } from './config'
 import Service from './service'
-import qs from 'qs'
 
 
-function createAxiosService (instance, options) {
+function createAxiosService (axios, options) {
   const service = new Service({
     requestDefaults: { ...requestDefaults },
     createdRequestStack: [],
     createdAxiosInstanceStack: [],
-    instance,
+    instance: axios,
     ...options
   })
 
@@ -42,7 +42,7 @@ function createAxiosService (instance, options) {
       return instance(config)
         .then(response => {
           if (!response) {
-            logger.error(`http请求失败: 失败原因请检查'axios.interceptors.request.use'中第二个函数返回值是否为'Promise.reject'`)
+            logger.error('http请求失败: 失败原因请检查\'axios.interceptors.request.use\'中第二个函数返回值是否为\'Promise.reject\'')
             return Promise.reject(new Error('http请求失败'))
           }
 
@@ -73,12 +73,11 @@ function createAxiosService (instance, options) {
 
           if (code === successCode) {
             return Promise.resolve(responseData)
-          } else {
-            logger.error(`codeKey: [${codeKey}] 不匹配: `, `msg: ${msg}, code: ${code} `, ...requestInfo, 'response: ', response)
-            return Promise.reject(responseData)
           }
-        }, (e) => {
-          logger.error(`请求失败: `, ...requestInfo, '; error : ', e)
+          logger.error(`codeKey: [${codeKey}] 不匹配: `, `msg: ${msg}, code: ${code} `, ...requestInfo, 'response: ', response)
+          return Promise.reject(responseData)
+        }, e => {
+          logger.error('请求失败: ', ...requestInfo, '; error : ', e)
           return Promise.reject(e)
         })
     }
@@ -93,12 +92,12 @@ function createAxiosService (instance, options) {
     let asyncAxiosInstance
     let _request
     let $httpResolve
-    let timeout = 3000
-    let $httpReady = new Promise((resolve, reject) => {
+    const timeout = 3000
+    const $httpReady = new Promise((resolve, reject) => {
       $httpResolve = resolve
     })
 
-    let tid = setTimeout(() => {
+    const tid = setTimeout(() => {
       if (!axiosInstance) {
         logger.error('请注入axios实例, 如: axiosService.init(axios, config)')
       }
@@ -137,7 +136,7 @@ function createAxiosService (instance, options) {
     if (!axiosInstance) {
       // 异步注入axois情况, getInstance也是一次
       asyncAxiosInstance = getInstaceSync()
-      asyncAxiosInstance.then((_axiosInstance) => {
+      asyncAxiosInstance.then(_axiosInstance => {
         axiosInstance = _axiosInstance
       })
     }
@@ -145,12 +144,6 @@ function createAxiosService (instance, options) {
     return {
       getAxiosInstance: _ => axiosInstance,
       getAsyncAxiosInstance: _ => asyncAxiosInstance,
-    }
-  }
-
-  const jsonWrapperRequest = function jsonWrapperRequest (baseConfigs) {
-    return function getRequest (config) {
-
     }
   }
 
@@ -183,22 +176,21 @@ function createAxiosService (instance, options) {
       if (axiosInstance) {
         _request = getRequestProxy(axiosInstance, responseKeys)
       } else {
-        asyncAxiosInstance && asyncAxiosInstance.then((axiosInstance) => {
-          _request = getRequestProxy(axiosInstance, responseKeys)
+        asyncAxiosInstance && asyncAxiosInstance.then(resposeAsyncAxiosIinstance => {
+          _request = getRequestProxy(resposeAsyncAxiosIinstance, responseKeys)
         })
       }
 
       return function handleRequest (...params) {
         if (_request) {
           return _request(...params)
-        } else {
-          return asyncAxiosInstance.then(() => _request(...params))
         }
+        return asyncAxiosInstance.then(() => _request(...params))
       }
     }
 
     // 具体请求的装饰器, responseKeys => request, 将外层的配置参数进行预处理, 保证requestProxy只直接收axios的config
-    const requestConnect = fn =>
+    const requestConnect = fn => {
       /**
        *
        * @param {String} url 请求的url后缀
@@ -206,10 +198,11 @@ function createAxiosService (instance, options) {
        * @param {Object} moreConfigs 该值为自定义的, axios-service不会处理, 该config值会透传到 axios中interceptors中的第一个参数
        * @return {Function} fn执行结果
        */
-      (url, responseKeys, ...args) => {
+      return (url, responseKeys, ...args) => {
         const request = getRequest(responseKeys)
         return fn(url, request, ...args)
       }
+    }
 
     // merge tranform
     const mergeTransform = (transforms = [], fn) => {
@@ -225,7 +218,7 @@ function createAxiosService (instance, options) {
        *
        * @returns {Function} 业务层做请求的函数
        */
-      get: requestConnect(function axiosServiceGet (url, request, moreConfigs) {
+      get: requestConnect((url, request, moreConfigs) => {
         /**
          * @param {Object} params 即get请求需要的数据
          * @param {Object} config 请求接口的配置项, 详见https://github.com/axios/axios#request-config
@@ -243,23 +236,23 @@ function createAxiosService (instance, options) {
           },
         })
       }),
-      post: requestConnect(function axiosServicePost (url, request, moreConfigs) {
+      post: requestConnect((url, request, moreConfigs) => {
         /**
          * @param {Object} data 即post请求需要的数据
          * 注意: post请求, 第一个参数传data
          */
         return (data, configs) => request({ url, method: POST, data, ...configs, ...moreConfigs })
       }),
-      postXFormData: requestConnect(function axiosServicePostXForm (url, request, moreConfigs) {
+      postXFormData: requestConnect((url, request, moreConfigs) => {
         return (data, configs = {}) => {
           return request({
             url,
             method: POST,
             data,
-            transformRequest: mergeTransform([function (data = {}, headers) {
-              return Object.keys(data)
+            transformRequest: mergeTransform([function (_data = {}, headers) {
+              return Object.keys(_data)
                 .reduce((formData, key) => {
-                  formData.append(key, data[key])
+                  formData.append(key, _data[key])
                   return formData
                 }, new FormData())
             }], 'transformRequest'),
@@ -273,14 +266,14 @@ function createAxiosService (instance, options) {
           })
         }
       }),
-      postXFormString: requestConnect(function axiosServicePostXFormString (url, request, moreConfigs) {
+      postXFormString: requestConnect((url, request, moreConfigs) => {
         return (data, configs = {}) => {
           return request({
             url,
             method: POST,
             data,
-            transformRequest: mergeTransform([function (data = {}, headers) {
-              return qs.stringify(data)
+            transformRequest: mergeTransform([function (_data = {}, headers) {
+              return qs.stringify(_data)
             }], 'transformRequest'),
             // post请求: 浏览器会自动识别出Content-Type为: application/x-www-form-urlencoded, FormData有其他类型, 如: multipart/form-data
             // 如果是json情况, axios在defaults.transformRequest中会将headers中的Content-Type设置为'application/json', 并将data对象JSON.strigify, 这样浏览器才能识别出Request Payload, 详见: https://github.com/axios/axios/blob/master/lib/defaults.js#L50
@@ -301,42 +294,37 @@ function createAxiosService (instance, options) {
        * @param {Object} responseKeys 请求配置项
        * @returns {Function} 具体请求的函数
        */
-      restFulGet: requestConnect(function axiosServiceRestFulGet (restFulUrl, request, moreConfigs) {
+      restFulGet: requestConnect((restFulUrl, request, moreConfigs) => {
         /**
          * @param {Object} urlData restFul中需要替换url的值, 拼接的过程serviceProxy会处理
          * @param {Object} params
          * @param {Object} configs 请求配置项
          */
-        return (urlData, params, configs) =>
-          request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs })
+        return (urlData, params, configs) => request({ url: formatRestFulUrl(restFulUrl, urlData), method: GET, params, ...configs, ...moreConfigs })
       }),
-      restFulPost: requestConnect(function axiosServicePost (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) =>
-          request({ url: formatRestFulUrl(restFulUrl, urlData), method: POST, data, ...configs, ...moreConfigs })
+      restFulPost: requestConnect((restFulUrl, request, moreConfigs) => {
+        return (urlData, data, configs) => request({ url: formatRestFulUrl(restFulUrl, urlData), method: POST, data, ...configs, ...moreConfigs })
       }),
-      delete: requestConnect(function axiosServiceDelete (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) =>
-          request({ url: formatRestFulUrl(restFulUrl, urlData), method: DELETE, data, ...configs, ...moreConfigs })
+      delete: requestConnect((restFulUrl, request, moreConfigs) => {
+        return (urlData, data, configs) => request({ url: formatRestFulUrl(restFulUrl, urlData), method: DELETE, data, ...configs, ...moreConfigs })
       }),
-      put: requestConnect(function axiosServicePut (restFulUrl, request, moreConfigs) {
-        return (urlData, data, configs) =>
-          request({ url: formatRestFulUrl(restFulUrl, urlData), method: PUT, data, ...configs, ...moreConfigs })
+      put: requestConnect((restFulUrl, request, moreConfigs) => {
+        return (urlData, data, configs) => request({ url: formatRestFulUrl(restFulUrl, urlData), method: PUT, data, ...configs, ...moreConfigs })
       }),
-      patch: requestConnect(function axiosServicePatch (restFulUrl, request, ...moreConfigs) {
-        return (urlData, data, configs) =>
-          request({ url: formatRestFulUrl(restFulUrl, urlData), method: PATCH, data, ...configs, ...moreConfigs })
+      patch: requestConnect((restFulUrl, request, ...moreConfigs) => {
+        return (urlData, data, configs) => request({ url: formatRestFulUrl(restFulUrl, urlData), method: PATCH, data, ...configs, ...moreConfigs })
       }),
-      head: requestConnect(function axiosServiceHead (url, request, ...moreConfigs) {
+      head: requestConnect((url, request, ...moreConfigs) => {
         return configs => request({ url, method: HEAD, ...configs, ...moreConfigs })
       }),
-      options: requestConnect(function axiosServiceOptions (url, request, ...moreConfigs) {
+      options: requestConnect((url, request, ...moreConfigs) => {
         return configs => request({ url, method: OPTIONS, ...configs, ...moreConfigs })
       }),
-      request: requestConnect(function axiosServiceRequest (url, request, ...moreConfigs) {
+      request: requestConnect((url, request, ...moreConfigs) => {
         return configs => request({ url, ...configs, ...moreConfigs })
       }),
       // todo
-      jsonp: requestConnect(function axiosServiceJsonp (url, request, ...moreConfigs) {
+      jsonp: requestConnect((url, request, ...moreConfigs) => {
 
       })
     }

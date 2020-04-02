@@ -2,13 +2,12 @@ export const deepCopy = (target, ...source) => {
 
 }
 
-export const formatRestFulUrl = (resfulUrl = '', urlData = {}) =>
-  Object.keys(urlData || {})
-    .reduce((url, key) => url.replace(`$${key}`, urlData[key]), resfulUrl || '')
+export const formatRestFulUrl = (resfulUrl = '', urlData = {}) => Object.keys(urlData || {})
+  .reduce((url, key) => url.replace(`$${key}`, urlData[key]), resfulUrl || '')
 
 export const joinRootAndPath = (root, path) => {
-  let slashStartReplace = str => str.replace(/^\//, '')
-  let slashEndReplace = str => str.replace(/\/$/, '')
+  const slashStartReplace = str => str.replace(/^\//, '')
+  const slashEndReplace = str => str.replace(/\/$/, '')
   return `${slashEndReplace(root)}/${slashStartReplace(path)}`
 }
 
@@ -43,7 +42,7 @@ export const isMustObject = function (val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a String, otherwise false
  */
-export function isString(val) {
+export function isString (val) {
   return typeof val === 'string';
 }
 
@@ -53,7 +52,7 @@ export function isString(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Number, otherwise false
  */
-export function isNumber(val) {
+export function isNumber (val) {
   return typeof val === 'number';
 }
 
@@ -63,7 +62,7 @@ export function isNumber(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if the value is undefined, otherwise false
  */
-export function isUndefined(val) {
+export function isUndefined (val) {
   return typeof val === 'undefined';
 }
 
@@ -73,7 +72,7 @@ export function isUndefined(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is an Object, otherwise false
  */
-export function isObject(val) {
+export function isObject (val) {
   return val !== null && typeof val === 'object';
 }
 
@@ -103,12 +102,12 @@ export function forEach (obj, fn) {
 
   if (isArray(obj)) {
     // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
+    for (let i = 0, l = obj.length; i < l; i++) {
       fn(obj[i], i, obj)
     }
   } else {
     // Iterate over object keys
-    for (var key in obj) {
+    for (const key in obj) {
       if (hasOwnProperty.call(obj, key)) {
         fn(obj[key], key, obj)
       }
@@ -133,9 +132,9 @@ export function forEach (obj, fn) {
  * @param {Object} obj1 Object to merge
  * @returns {Object} Result of all merge properties
  */
-export function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {}
-  function assignValue(val, key) {
+export function merge (/* obj1, obj2, obj3, ... */...args) {
+  const result = {}
+  function assignValue (val, key) {
     if (typeof result[key] === 'object' && typeof val === 'object') {
       result[key] = merge(result[key], val)
     } else {
@@ -143,8 +142,8 @@ export function merge(/* obj1, obj2, obj3, ... */) {
     }
   }
 
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue)
+  for (let i = 0, l = args.length; i < l; i++) {
+    forEach(args[i], assignValue)
   }
   return result
 }
@@ -157,8 +156,8 @@ export function merge(/* obj1, obj2, obj3, ... */) {
  * @param {Object} obj1 Object to merge
  * @returns {Object} Result of all merge properties
  */
-export function deepMerge(/* obj1, obj2, obj3, ... */) {
-  var result = {}
+export function deepMerge (/* obj1, obj2, obj3, ... */...args) {
+  let result = {}
   function assignValue (target, source) {
     if (isMustObject(target) && isMustObject(source)) {
       Object.keys(source).forEach(sourceKey => {
@@ -176,8 +175,8 @@ export function deepMerge(/* obj1, obj2, obj3, ... */) {
     return target
   }
 
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    result = assignValue(result, arguments[i])
+  for (let i = 0, l = args.length; i < l; i++) {
+    result = assignValue(result, args[i])
   }
 
   return result
@@ -187,8 +186,10 @@ export function deepMerge(/* obj1, obj2, obj3, ... */) {
  * Mix properties into target object.
  */
 export const extend = function extend (to, _from) {
-  for (var key in _from) {
-    to[key] = _from[key]
+  for (const key in _from) {
+    if (Object.prototype.hasOwnProperty.call(_from, key)) {
+      to[key] = _from[key]
+    }
   }
   return to
 }

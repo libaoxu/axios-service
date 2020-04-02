@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 import { getMockDecorateByEnv, mockDecorate } from 'axios-service'
 
 // const mockDecorator = getMockDecoratorByEnv(process.env.NODE_ENV === 'development')

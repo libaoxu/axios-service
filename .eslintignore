@@ -1,1 +1,12 @@
+# 忽略目录
+lib/
 dist/
+tests/
+node_modules/
+
+# node 覆盖率文件
+coverage/
+
+# 忽略文件
+**/*-min.js
+**/*.min.js

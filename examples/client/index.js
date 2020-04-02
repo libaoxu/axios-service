@@ -1,6 +1,5 @@
 import axiosService from 'axios-service'
 import { getInfo, postInfo, postXFormWithStaticHeader, getGitHubUser, getInfoWithMock, apis, postXFormDataWithStaticHeader, postXFormStringWithStaticHeader, getInfoNoDataKey } from './apis'
-import jsonp from 'jsonp'
 import axios from 'axios'
 import { axiosServiceCreateGetInfo } from './axios-service-create';
 import { getInfoCustom, postInfoCustom, getInfoCustomComposedData, postInfoCustomComposedParamsAndData } from './apis-request-custom';
@@ -63,16 +62,6 @@ const restFulDemo = _ => getGitHubUser({ user: 'libaoxu' })
 
 const normalGetInfoMock = _ => getInfoWithMock()
 const normalGetInfoMockByClass = _ => apis.getInfoWithMock()
-
-function jsonpDemo () {
-  jsonp('https://suggest.taobao.com/sug', {
-    param: 'q=love&callback',
-    // prefix: 'cb',
-    // name: 'callback'
-  }, (err, res) => {
-    err && console.log(res)
-  })
-}
 
 const requestChains = [
   {

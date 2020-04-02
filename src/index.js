@@ -10,6 +10,7 @@ const { getMessageDecorator, getMockDecoratorByEnv, mockDecorator, getMockDecora
 
 const axiosService = createAxiosService()
 const getRequestsByRoot = axiosService.getRequestsByRoot
+// eslint-disable-next-line no-undef
 const version = __VERSION__
 
 export {

@@ -1,25 +1,18 @@
+const path = require('path');
 const merge = require('webpack-merge')
 const baseConfig = require('./webpack.base.conf')
-const path = require('path')
-const isProd = process.env.NODE_ENV === 'production'
-const fileName = isProd ? 'axios-service.production.min' : 'axios-service.development'
+
+const isProd = process.env.NODE_ENV === 'production';
+const filename = isProd ? 'axios-service.production.min.js' : 'axios-service.development.js';
 
 module.exports = merge(baseConfig, {
+  entry: './src/index.js',
   mode: isProd ? 'production' : 'development',
-  entry: { 
-    [fileName]: path.join(__dirname, '../src/index.js') 
-  },
   output: {
-    library: 'axiosService',
-    libraryTarget: 'umd',
-    filename: `${fileName}.js`,
-    auxiliaryComment: {
-      root: 'libaoxu@inke.cn'
-    },
-    globalObject: 'typeof self !== "undefined" ? self : this'
-    // libraryExport: 'default'
+    filename,
+    path: path.resolve('./dist'),
+    library: 'axios-service',
+    libraryTarget: 'umd'
   },
   devtool: 'source-map',
-  plugins: [
-  ]
-})
+});
