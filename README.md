@@ -1,5 +1,15 @@
 # axios-service
 
+## TODO
+- TS, TS, TS, 完整的类型辅助, 非常有助于框架的理解
+- 精简流程, 简化繁琐调用, 暴露更精简易理解的API
+- 在各种service扩展这块也要精简, 保持API不变情况, 精简源码
+- 尽量与`createDecorator`做到更好的联动, 也得修改`createDecorator`部分bug
+- 接入github ci发布npm流程远端自动化
+- 解决一些1.x版本中大家提出来的完善功能
+- 更好的文档和DEMO示例
+- 推广到更多的社区
+
 [![npm version](https://img.shields.io/npm/v/axios-service.svg)](https://www.npmjs.com/package/axios-service)
 [![build status](https://api.travis-ci.org/libaoxu/axios-service.svg)](https://travis-ci.org/libaoxu/axios-service)
 
